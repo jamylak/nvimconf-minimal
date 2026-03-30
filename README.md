@@ -10,11 +10,7 @@ One-time setup after clone:
 git submodule update --init --recursive
 ```
 
-One-time `fff.nvim` binary install inside Neovim:
-
-```vim
-:FFFInstall
-```
+The `fff.nvim` native binary auto-installs on first use. If you want to do it manually instead, run `:FFFInstall`.
 
 Try it:
 
