@@ -1,0 +1,3 @@
+[submodule "pack/vendor/opt/fff.nvim"]
+	path = pack/vendor/opt/fff.nvim
+	url = https://github.com/dmtrKovalenko/fff.nvim
