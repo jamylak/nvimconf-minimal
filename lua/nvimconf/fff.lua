@@ -1,5 +1,5 @@
 local M = {}
-local picker_history = require('nvimconf2.picker_history')
+local picker_history = require('nvimconf.picker_history')
 
 local function normalize_query(query)
   if type(query) ~= 'string' or query == '' then
@@ -344,7 +344,7 @@ function M.setup(enabled)
         vim.cmd.stopinsert()
         close_picker()
         vim.schedule(function()
-          require('nvimconf2.project_picker').open()
+          require('nvimconf.project_picker').open()
         end)
       end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF project picker' })
 

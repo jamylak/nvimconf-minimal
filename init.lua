@@ -1,19 +1,19 @@
-local bootstrap = require("nvimconf2.bootstrap")
+local bootstrap = require("nvimconf.bootstrap")
 
 local function treesitter_install(method)
   return function()
-    return require("nvimconf2.treesitter_install")[method]()
+    return require("nvimconf.treesitter_install")[method]()
   end
 end
 
-require("nvimconf2.options")
-require("nvimconf2.theme").apply()
-require("nvimconf2.oil").setup()
-require("nvimconf2.keymaps")
-require("nvimconf2.fff").setup(bootstrap.fff_available)
-require("nvimconf2.grug_far").setup()
-require("nvimconf2.lsp").setup()
-require("nvimconf2.blink").setup()
+require("nvimconf.options")
+require("nvimconf.theme").apply()
+require("nvimconf.oil").setup()
+require("nvimconf.keymaps")
+require("nvimconf.fff").setup(bootstrap.fff_available)
+require("nvimconf.grug_far").setup()
+require("nvimconf.lsp").setup()
+require("nvimconf.blink").setup()
 
 vim.api.nvim_create_user_command(
   "TSInstallFavorites",

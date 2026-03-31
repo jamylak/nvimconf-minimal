@@ -53,7 +53,7 @@ local lsp_filetypes = {
 }
 
 local function runtime()
-  return require('nvimconf2.lsp_runtime')
+  return require('nvimconf.lsp_runtime')
 end
 
 function M.setup()

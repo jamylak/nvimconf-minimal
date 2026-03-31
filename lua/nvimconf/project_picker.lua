@@ -1,5 +1,5 @@
 local M = {}
-local picker_history = require('nvimconf2.picker_history')
+local picker_history = require('nvimconf.picker_history')
 
 local ns = vim.api.nvim_create_namespace('nvimconf2.project_picker')
 
@@ -298,7 +298,7 @@ local function open_project(path, reuse_existing)
 
   if reuse_existing and switch_to_project_tab(project_path) then
     vim.cmd.tcd(vim.fn.fnameescape(project_path))
-    require('nvimconf2.fff').find_files_in_dir(project_path)
+    require('nvimconf.fff').find_files_in_dir(project_path)
     return
   end
 
@@ -307,7 +307,7 @@ local function open_project(path, reuse_existing)
   end
 
   vim.cmd.tcd(vim.fn.fnameescape(project_path))
-  require('nvimconf2.fff').find_files_in_dir(project_path)
+  require('nvimconf.fff').find_files_in_dir(project_path)
 end
 
 local function select_current(reuse_existing)

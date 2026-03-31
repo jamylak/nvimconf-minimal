@@ -26,15 +26,15 @@ local function setup_terminal_keymaps()
 end
 
 local function pick_window()
-	require("nvimconf2.window_picker").pick()
+	require("nvimconf.window_picker").pick()
 end
 
 local function open_project_picker()
-	require("nvimconf2.project_picker").open()
+	require("nvimconf.project_picker").open()
 end
 
 local function reopen_last_picker()
-	require("nvimconf2.picker_history").reopen()
+	require("nvimconf.picker_history").reopen()
 end
 
 local function call_diagnostic(method)
@@ -48,23 +48,23 @@ local function search_prompt()
 end
 
 local edit = function(method)
-	return call("nvimconf2.actions.edit", method)
+	return call("nvimconf.actions.edit", method)
 end
 
 local git = function(method)
-	return call("nvimconf2.actions.git", method)
+	return call("nvimconf.actions.git", method)
 end
 
 local external = function(method)
-	return call("nvimconf2.actions.external", method)
+	return call("nvimconf.actions.external", method)
 end
 
 local terminal = function(method)
-	return call("nvimconf2.actions.terminal", method)
+	return call("nvimconf.actions.terminal", method)
 end
 
 local treesitter_select = function(method)
-	return call("nvimconf2.treesitter_select", method)
+	return call("nvimconf.treesitter_select", method)
 end
 
 setup_terminal_keymaps()
