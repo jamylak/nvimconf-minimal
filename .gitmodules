@@ -7,3 +7,7 @@
 [submodule "pack/vendor/opt/grug-far.nvim"]
 	path = pack/vendor/opt/grug-far.nvim
 	url = https://github.com/MagicDuck/grug-far.nvim.git
+[submodule "pack/vendor/opt/nvim-window"]
+	path = pack/vendor/opt/nvim-window
+	url = https://github.com/jamylak/nvim-window.git
+	branch = feature/disable-hints

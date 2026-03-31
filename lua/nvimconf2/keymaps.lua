@@ -4,6 +4,7 @@ local edit = require("nvimconf2.actions.edit")
 local git = require("nvimconf2.actions.git")
 local external = require("nvimconf2.actions.external")
 local terminal = require("nvimconf2.actions.terminal")
+local window_picker = require("nvimconf2.window_picker")
 
 terminal.setup()
 
@@ -56,6 +57,20 @@ map("n", "<A-y>", external.yazi_here, { noremap = true, silent = true, desc = "O
 map("n", "<C-y>", external.yazi_new_tab, { noremap = true, silent = true, desc = "Open yazi in new tab" })
 
 -- Windows and buffers
+map("n", "gj", window_picker.pick, { silent = true, desc = "Jump to window" })
+map("i", "gj", function()
+	vim.cmd.stopinsert()
+	window_picker.pick()
+end, { silent = true, desc = "Jump to window" })
+map("v", "gj", function()
+	vim.cmd.normal({ args = { "<Esc>" }, bang = true })
+	window_picker.pick()
+end, { silent = true, desc = "Jump to window" })
+map("t", "gj", function()
+	vim.cmd.stopinsert()
+	window_picker.pick()
+end, { silent = true, desc = "Jump to window" })
+
 map("n", "<a-d>", "<C-W><C-W>", { silent = true, desc = "Next window" })
 map("n", "m", "<C-W><C-W>", { silent = true, desc = "Next window" })
 map("n", "M", "<C-W>W", { silent = true, desc = "Previous window" })
