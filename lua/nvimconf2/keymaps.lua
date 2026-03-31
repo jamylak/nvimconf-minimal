@@ -113,6 +113,17 @@ map('n', '[<Space>', 'O<Esc>j', { silent = true, desc = 'Line above' })
 map('n', ']<Space>', 'o<Esc>k', { silent = true, desc = 'Line below' })
 
 
+map('n', 'qp', 'yyp', { silent = true, desc = 'Duplicate line' })
+map('n', '<C-p>', 'yyp', { silent = true, desc = 'Duplicate line' })
+map('v', 'q', '$h', { silent = true, desc = 'End of line' })
+map('x', '<C-p>', function()
+  local cmd = vim.fn.mode() == 'V' and "y'>vo<esc>pO<esc>j" or "y']o<esc>pO<esc>j"
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), 'n', true)
+end, { noremap = true, desc = 'Duplicate selection' })
+map('n', 'qd', 'dd', { silent = true, desc = 'Delete line' })
+map('n', 'dq', 'dd', { silent = true, desc = 'Delete line' })
+map('n', 'qy', 'yy', { silent = true, desc = 'Yank line' })
+map('n', 'qm', 'v$', { silent = true, desc = 'Visual to EOL' })
 map('n', '<C-;>', 'g;', { silent = true, desc = 'Previous change' })
 map('n', '<C-,>', 'g,', { silent = true, desc = 'Next change' })
 
