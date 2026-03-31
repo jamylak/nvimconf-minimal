@@ -1,6 +1,17 @@
 local M = {}
 local picker_history = require('nvimconf2.picker_history')
 
+local function normalize_query(query)
+  if type(query) ~= 'string' or query == '' then
+    return nil
+  end
+
+  return query
+end
+
+local open_file_picker
+local live_grep
+
 -- Clear cached fff modules so a failed pre-install load can be retried cleanly.
 local function reset_modules()
   package.loaded['fff'] = nil
@@ -139,12 +150,74 @@ local function reopen(fn)
   end)
 end
 
--- Open the normal fff file picker.
-local function find_files()
-  picker_history.set(find_files)
-  reopen(function()
-    require('fff').find_files()
+local function remember_file_picker(opts)
+  opts = opts or {}
+
+  local query = normalize_query(opts.query)
+  local cwd = opts.cwd
+  local title = opts.title
+
+  picker_history.set(function()
+    open_file_picker({
+      query = query,
+      cwd = cwd,
+      title = title,
+    })
   end)
+end
+
+local function remember_live_grep(query, cwd)
+  query = normalize_query(query)
+
+  picker_history.set(function()
+    live_grep(query, cwd)
+  end)
+end
+
+open_file_picker = function(opts)
+  opts = opts or {}
+
+  local query = normalize_query(opts.query)
+  local cwd = opts.cwd
+  local title = opts.title
+
+  remember_file_picker({
+    query = query,
+    cwd = cwd,
+    title = title,
+  })
+
+  reopen(function()
+    local fff = require('fff')
+    local picker_opts = {}
+
+    if cwd and cwd ~= '' then
+      local ok = fff.change_indexing_directory(cwd)
+      if ok == false then
+        return
+      end
+      picker_opts.cwd = cwd
+    end
+
+    if title and title ~= '' then
+      picker_opts.title = title
+    end
+
+    if query then
+      picker_opts.query = query
+    end
+
+    fff.find_files(picker_opts)
+  end)
+end
+
+-- Open the normal fff file picker.
+local function find_files(query, cwd, title)
+  open_file_picker({
+    query = query,
+    cwd = cwd,
+    title = title,
+  })
 end
 
 -- Back the :FFFFind command, preserving fff's query-vs-directory behavior.
@@ -169,10 +242,10 @@ local function find_files_cmd(opts)
 end
 
 -- Open fff live grep, optionally carrying over query/cwd from the picker.
-local function live_grep(query, cwd)
-  picker_history.set(function()
-    live_grep(query, cwd)
-  end)
+live_grep = function(query, cwd)
+  query = normalize_query(query)
+
+  remember_live_grep(query, cwd)
 
   reopen(function()
     require('fff').live_grep({
@@ -186,13 +259,29 @@ local function live_grep(query, cwd)
 end
 
 local function find_files_in_dir(path)
-  picker_history.set(function()
-    find_files_in_dir(path)
-  end)
+  find_files(nil, path, 'Files in ' .. vim.fn.fnamemodify(path, ':t'))
+end
 
-  reopen(function()
-    require('fff').find_files_in_dir(path)
-  end)
+local function sync_picker_history()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if not ok or not picker_ui.state or not picker_ui.state.active then
+    return
+  end
+
+  local state = picker_ui.state
+  local cwd = state.config and state.config.base_path or vim.uv.cwd()
+  local query = normalize_query(state.query)
+
+  if state.mode == 'grep' then
+    remember_live_grep(query, cwd)
+    return
+  end
+
+  remember_file_picker({
+    query = query,
+    cwd = cwd,
+    title = state.config and state.config.title or nil,
+  })
 end
 
 local function close_picker()
@@ -240,6 +329,8 @@ function M.setup(enabled)
   vim.api.nvim_create_autocmd('FileType', {
     pattern = 'fff_input',
     callback = function(args)
+      sync_picker_history()
+
       vim.keymap.set('i', '<m-u>', function()
         local picker_ui = require('fff.picker_ui')
         local query = picker_ui.state.query
@@ -256,6 +347,13 @@ function M.setup(enabled)
           require('nvimconf2.project_picker').open()
         end)
       end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF project picker' })
+
+      local group = vim.api.nvim_create_augroup('nvimconf2.fff_history.' .. args.buf, { clear = true })
+      vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
+        group = group,
+        buffer = args.buf,
+        callback = sync_picker_history,
+      })
     end,
   })
 

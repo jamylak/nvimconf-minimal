@@ -16,6 +16,13 @@ local state = {
   query = '',
 }
 
+local function remember_open(query)
+  local saved_query = query or ''
+  picker_history.set(function()
+    M.open(saved_query)
+  end)
+end
+
 local function normalize(path)
   if not path or path == '' then
     return ''
@@ -332,12 +339,14 @@ local function use_selected_name()
   end
 
   state.query = entry.name
+  remember_open(state.query)
   set_prompt_text(state.query)
   render()
 end
 
 local function update_query()
   state.query = read_query()
+  remember_open(state.query)
   state.selected = 1
   render()
 end
@@ -361,8 +370,8 @@ local function create_window(buf, opts)
   return win
 end
 
-function M.open()
-  picker_history.set(M.open)
+function M.open(initial_query)
+  remember_open(initial_query)
 
   if state.active then
     if state.prompt_win and vim.api.nvim_win_is_valid(state.prompt_win) then
@@ -373,9 +382,9 @@ function M.open()
   end
 
   state.entries = project_entries()
-  state.filtered = vim.deepcopy(state.entries)
+  state.query = initial_query or ''
+  state.filtered = filter_entries(state.query)
   state.selected = #state.filtered > 0 and 1 or 0
-  state.query = ''
   state.active = true
 
   local width = math.min(math.max(54, math.floor(vim.o.columns * 0.52)), 96)
@@ -416,7 +425,7 @@ function M.open()
   })
 
   vim.wo[state.list_win].cursorline = false
-  set_prompt_text('')
+  set_prompt_text(state.query)
   render()
 
   local function map(mode, lhs, rhs, desc)
