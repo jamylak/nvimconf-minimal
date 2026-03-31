@@ -149,9 +149,13 @@ end, { silent = true, noremap = true, desc = "Search" })
 
 map("n", "[<Space>", "O<Esc>j", { silent = true, desc = "Line above" })
 map("n", "]<Space>", "o<Esc>k", { silent = true, desc = "Line below" })
+map("n", "<C-j>", "<cmd>m .+1<CR>==", { silent = true, desc = "Move line down" })
+map("n", "<C-k>", "<cmd>m .-2<CR>==", { silent = true, desc = "Move line up" })
 map("n", "qp", "yyp", { silent = true, desc = "Duplicate line" })
 map("n", "<C-p>", "yyp", { silent = true, desc = "Duplicate line" })
 map("v", "q", "$h", { silent = true, desc = "End of line" })
+map("x", "<C-j>", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move selection down" })
+map("x", "<C-k>", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move selection up" })
 map("x", "<C-p>", function()
 	local cmd = vim.fn.mode() == "V" and "y'>vo<esc>pO<esc>j" or "y']o<esc>pO<esc>j"
 	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(cmd, true, true, true), "n", true)
