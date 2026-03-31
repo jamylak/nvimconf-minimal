@@ -438,6 +438,7 @@ function M.open()
   map({ 'i', 'n' }, '<C-j>', function() select_current(true) end, 'Reuse existing project tab')
   map({ 'i', 'n' }, '<S-CR>', create_project, 'Create project')
   map({ 'i', 'n' }, '<C-e>', use_selected_name, 'Use selected project name')
+  map('i', '<C-w>', '<C-S-w>', 'Delete word')
 
   local group = vim.api.nvim_create_augroup('nvimconf2.project_picker.' .. state.prompt_buf, { clear = true })
   vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
