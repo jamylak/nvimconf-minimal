@@ -2,6 +2,38 @@ local M = {}
 
 local loaded = false
 
+local function current_oil_path()
+  local path = vim.fn.expand '%:p'
+  if path:match '^oil://' then
+    path = string.sub(path, 7)
+  end
+  return path
+end
+
+local function window_change_directory()
+  local dir_path = vim.fn.fnamemodify(current_oil_path(), ':h')
+  vim.cmd('lcd ' .. vim.fn.fnameescape(dir_path))
+end
+
+local function tab_change_directory()
+  local dir_path = vim.fn.fnamemodify(current_oil_path(), ':h')
+  vim.cmd('tcd ' .. vim.fn.fnameescape(dir_path))
+end
+
+local function set_global_keymaps()
+  local map = vim.keymap.set
+  local home = os.getenv 'HOME'
+  local config_dir = vim.fn.stdpath 'config'
+
+  map('n', '<leader>od', '<CMD>Oil ' .. home .. '/.config/dotfiles<CR>', { desc = '[O]pen [D]otfiles' })
+  map('n', '<leader>ot', '<CMD>Oil /tmp<CR>', { desc = '[O]pen /[T]mp' })
+  map('n', '<leader>oc', '<CMD>Oil ' .. config_dir .. '<CR>', { desc = '[O]pen [N]eovim Config' })
+  map('n', '<leader>on', '<CMD>Oil ' .. config_dir .. '/pack/vendor/opt<CR>', { desc = '[O]pen [N]eovim Plugins Folder' })
+  map('n', '<leader>op', '<CMD>Oil ' .. home .. '/proj<CR>', { desc = '[O]pen Projects' })
+  map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+  map('n', '<c-x><c-j>', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
+end
+
 local function notify_missing()
   vim.schedule(function()
     vim.notify('oil.nvim is missing. Run: git submodule update --init --recursive', vim.log.levels.ERROR)
@@ -23,6 +55,74 @@ local function load()
 
   require('oil').setup({
     default_file_explorer = true,
+    columns = {
+      'icon',
+      'size',
+      'mtime',
+    },
+    keymaps = {
+      ['<m-o>'] = function()
+        vim.cmd 'Telescope oldfiles'
+      end,
+      ['<m-i>'] = function()
+        vim.cmd 'Telescope find_files'
+      end,
+      ['cd'] = {
+        callback = tab_change_directory,
+        desc = 'Tab [C]hange [D]irectory',
+        mode = 'n',
+      },
+      ['<leader>lc'] = {
+        callback = window_change_directory,
+        desc = '[T]ab [C]hange [D]irectory',
+        mode = 'n',
+      },
+      ['<leader>tc'] = {
+        callback = tab_change_directory,
+        desc = '[T]ab [C]hange [D]irectory',
+        mode = 'n',
+      },
+      ['<leader>p'] = {
+        callback = function()
+          local oil = require('oil')
+          local filename = oil.get_cursor_entry().name
+          local dir = oil.get_current_dir()
+          oil.close()
+
+          local img_clip = require('img-clip')
+          img_clip.paste_image({}, dir .. filename)
+        end,
+        desc = 'Pase using imgclip',
+        mode = 'n',
+      },
+      ['gp'] = {
+        callback = function()
+          if vim.tbl_contains(require('oil.config').columns, 'permissions') then
+            require('oil').set_columns({ 'icon', 'size', 'mtime' })
+          else
+            require('oil').set_columns({ 'permissions', 'icon', 'size', 'mtime' })
+          end
+        end,
+        desc = 'Toggle of file permissions',
+      },
+      ['<leader>c'] = {
+        callback = function()
+          if require('oil.config').view_options.sort[2][1] == 'mtime' then
+            require('oil').set_sort({
+              { 'type', 'asc' },
+              { 'name', 'asc' },
+            })
+          else
+            require('oil').set_sort({
+              { 'type', 'desc' },
+              { 'mtime', 'desc' },
+            })
+          end
+        end,
+        desc = '[C]hange sort order',
+      },
+    },
+    view_options = { show_hidden = true },
   })
 
   loaded = true
@@ -59,6 +159,8 @@ local function open_from_command(opts)
 end
 
 function M.setup()
+  set_global_keymaps()
+
   vim.api.nvim_create_user_command('Oil', open_from_command, {
     nargs = '*',
     complete = 'dir',
