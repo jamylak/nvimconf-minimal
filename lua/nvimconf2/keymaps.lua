@@ -112,6 +112,9 @@ end, { silent = true, noremap = true, desc = 'Search' })
 map('n', '[<Space>', 'O<Esc>j', { silent = true, desc = 'Line above' })
 map('n', ']<Space>', 'o<Esc>k', { silent = true, desc = 'Line below' })
 
+
+map('n', '<C-;>', 'g;', { silent = true, desc = 'Previous change' })
+map('n', '<C-,>', 'g,', { silent = true, desc = 'Next change' })
 for _, lhs in ipairs({ 'ji', 'jk' }) do
   map('i', lhs, '<Esc>', { silent = true, desc = 'Escape insert mode' })
 end
