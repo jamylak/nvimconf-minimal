@@ -1,6 +1,7 @@
 local M = {}
 local breadcrumbs_by_buf = {}
 local selected_node_by_buf = {}
+local missing_parser_notified = {}
 local esc_key = vim.keycode('<Esc>')
 
 local function node_key(node)
@@ -32,12 +33,31 @@ local function parser_available(bufnr)
   return pcall(vim.treesitter.get_parser, bufnr)
 end
 
+local function notify_missing_parser(bufnr)
+  if missing_parser_notified[bufnr] then
+    return
+  end
+  missing_parser_notified[bufnr] = true
+
+  local filetype = vim.bo[bufnr].filetype
+  local label = filetype ~= '' and filetype or 'current buffer'
+  vim.schedule(function()
+    vim.notify('Treesitter node select is unavailable: no parser for ' .. label, vim.log.levels.WARN)
+  end)
+end
+
 local function maybe_start(bufnr)
   if not parser_available(bufnr) then
+    notify_missing_parser(bufnr)
     return false
   end
 
-  pcall(vim.treesitter.start, bufnr)
+  local ok = pcall(vim.treesitter.start, bufnr)
+  if not ok then
+    notify_missing_parser(bufnr)
+    return false
+  end
+
   return true
 end
 
@@ -303,6 +323,7 @@ vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI', 'BufLeave' }, {
   group = vim.api.nvim_create_augroup('nvimconf2.treesitter_select', { clear = true }),
   callback = function(args)
     selected_node_by_buf[args.buf] = nil
+    missing_parser_notified[args.buf] = nil
   end,
 })
 
