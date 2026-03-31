@@ -85,13 +85,32 @@ for i = 1, 8 do
   map('n', '<leader>t' .. i, ':tabn ' .. i .. '<CR>', { silent = true, desc = 'Go to tab ' .. i })
 end
 
+map('n', '<a-0>', ':tabn 1<CR>', { silent = true, desc = 'First tab' })
+map('n', '<a-9>', ':tabn $<CR>', { silent = true, desc = 'Last tab' })
+map('n', '<a-w>', edit.close_tab_or_quit, { silent = true, desc = 'Close tab or quit' })
+map('n', '<a-q>', '<cmd>q!<CR>', { silent = true, desc = 'Quit' })
+map('n', '<leader>tr', ':tabclose<CR>', { silent = true, desc = 'Tab remove' })
+map('n', '<leader>tl', ':tablast<CR>', { silent = true, desc = 'Tab last' })
+map('n', '<leader>tf', ':tabfirst<CR>', { silent = true, desc = 'Tab first' })
+map('n', '<leader>to', ':tabonly<CR>', { silent = true, desc = 'Tab only' })
+map('n', '<leader>tb', '<C-W>T', { silent = true, desc = 'Window to tab' })
+map('n', '<t', ':tabmove-1<CR>', { silent = true, desc = 'Move tab left' })
+map('n', '>t', ':tabmove+1<CR>', { silent = true, desc = 'Move tab right' })
+map('n', '<T', ':tabmove 0<CR>', { silent = true, desc = 'Move tab far left' })
+map('n', '>T', ':tabmove $<CR>', { silent = true, desc = 'Move tab far right' })
+
+-- Motions and edits
+map('n', 'qk', '$', { silent = true, desc = 'End of line' })
+map('n', '<C-e>', '$', { silent = true, desc = 'End of line' })
+map('v', '<C-e>', '$', { silent = true, desc = 'End of line' })
+map('n', '<C-a>', '0', { silent = true, desc = 'Start of line' })
+map('v', '<C-a>', '0', { silent = true, desc = 'Start of line' })
 map('n', '<Esc>', '<cmd>nohlsearch<CR>', { silent = true, desc = 'Clear search highlight' })
 map('n', '<C-s>', function()
   vim.fn.feedkeys(vim.api.nvim_replace_termcodes('/', true, true, true), 'n')
 end, { silent = true, noremap = true, desc = 'Search' })
-map('n', '<C-f>', function()
-  vim.fn.feedkeys(vim.api.nvim_replace_termcodes('/', true, true, true), 'n')
-end, { silent = true, noremap = true, desc = 'Search' })
+map('n', '[<Space>', 'O<Esc>j', { silent = true, desc = 'Line above' })
+map('n', ']<Space>', 'o<Esc>k', { silent = true, desc = 'Line below' })
 
 for _, lhs in ipairs({ 'ji', 'jk' }) do
   map('i', lhs, '<Esc>', { silent = true, desc = 'Escape insert mode' })
