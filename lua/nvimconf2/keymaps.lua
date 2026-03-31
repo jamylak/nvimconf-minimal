@@ -127,7 +127,6 @@ map("n", "sk", "<cmd>tabnext#<CR>", { silent = true, desc = "Swap tab" })
 map("n", "qj", "<C-W>p", { silent = true, desc = "Previous window" })
 map("n", "[b", "<cmd>bprev<CR>", { silent = true, desc = "Previous buffer" })
 map("n", "]b", "<cmd>bnext<CR>", { silent = true, desc = "Next buffer" })
-map("n", "L", "<cmd>b#<CR>", { silent = true, desc = "Last buffer" })
 
 -- Tabs
 map_each("n", { "[t", "<a-[>" }, "<cmd>tabprev<CR>", { silent = true, desc = "Previous tab" })
