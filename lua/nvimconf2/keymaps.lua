@@ -136,6 +136,10 @@ map('i', '<A-b>', '<C-o>b', { silent = true, desc = 'Back word' })
 map('i', '<A-f>', '<C-o>w', { silent = true, desc = 'Forward word' })
 map('i', '<A-d>', '<C-o>dw', { silent = true, desc = 'Delete word' })
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { silent = true, desc = 'Escape terminal mode' })
+map('n', '<leader>tt', terminal.new_tab, { desc = 'Terminal new tab' })
+map('n', '<S-CR>', terminal.new_tab, { desc = 'Terminal new tab' })
+map('n', '<leader>tv', terminal.vertical, { desc = 'Terminal vertical' })
+map('n', '<leader>n', terminal.send_repeat, { desc = 'Send repeat to terminal' })
 
 -- Diagnostics and quickfix
 map('n', '[d', vim.diagnostic.goto_prev, { desc = 'Previous diagnostic' })
@@ -153,7 +157,8 @@ map('n', '<leader>y', 'ggVG"+y', { noremap = true, silent = true, desc = 'Yank w
 vim.api.nvim_create_user_command('WQ', function()
   vim.cmd('wq!')
 end, { desc = 'Write and quit' })
-
 vim.api.nvim_create_user_command('Q', function()
   vim.cmd('qall!')
 end, { desc = 'Quit all' })
+
+return {}
