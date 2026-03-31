@@ -25,6 +25,7 @@ local function setup_blink()
       ['<C-n>'] = { 'select_next', 'fallback' },
       ['<C-p>'] = { 'select_prev', 'fallback' },
       ['<C-y>'] = { 'select_and_accept' },
+      ['<C-j>'] = { 'select_and_accept', 'fallback' },
     },
     fuzzy = {
       -- Important: prefer Blink's fast Rust matcher rather than the slower Lua fallback.
