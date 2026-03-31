@@ -52,8 +52,8 @@ local function setup_blink()
       },
     },
     sources = {
-      -- Important: this is intentionally minimal right now; add lsp/snippets later on purpose.
-      default = { 'path', 'buffer' },
+      -- Important: keep this small, but include LSP once language servers are attached.
+      default = { 'lsp', 'path', 'buffer' },
     },
     signature = {
       enabled = false,
