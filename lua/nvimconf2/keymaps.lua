@@ -115,11 +115,16 @@ map('n', ']<Space>', 'o<Esc>k', { silent = true, desc = 'Line below' })
 
 map('n', '<C-;>', 'g;', { silent = true, desc = 'Previous change' })
 map('n', '<C-,>', 'g,', { silent = true, desc = 'Next change' })
+
+-- Insert mode
 for _, lhs in ipairs({ 'ji', 'jk' }) do
   map('i', lhs, '<Esc>', { silent = true, desc = 'Escape insert mode' })
 end
 
-map('i', '<C-k>', check_and_delete, { expr = true, noremap = true, desc = 'Delete right or join line' })
+map('i', '<C-k>', edit.check_and_delete, { expr = true, noremap = true, desc = 'Delete right or join line' })
+map('i', '<C-y>', '<C-r>+', { silent = true, desc = 'Paste clipboard' })
+map('n', '<a-m>', '"+p', { silent = true, desc = 'Paste clipboard' })
+map('v', '<a-m>', '"+p', { silent = true, desc = 'Paste clipboard' })
 map('i', '<C-f>', '<Right>', { silent = true, desc = 'Right' })
 map('i', '<C-a>', '<Home>', { silent = true, desc = 'Home' })
 map('i', '<C-e>', '<End>', { silent = true, desc = 'End' })
