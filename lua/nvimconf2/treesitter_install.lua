@@ -28,7 +28,10 @@ local function has_tool(bin)
 end
 
 local function has_compiler()
-  local candidates = { vim.env.CC, "cc", "clang", "gcc", "zig" }
+  local candidates = { "cc", "clang", "gcc", "zig" }
+  if has_tool(vim.env.CC) then
+    return true
+  end
   for _, candidate in ipairs(candidates) do
     if has_tool(candidate) then
       return true
