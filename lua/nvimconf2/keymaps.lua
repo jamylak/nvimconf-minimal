@@ -34,14 +34,22 @@ for _, lhs in ipairs({ 'ji', 'jk' }) do
   map('i', lhs, '<Esc>', { silent = true, desc = 'Escape insert mode' })
 end
 
+map('i', '<C-k>', check_and_delete, { expr = true, noremap = true, desc = 'Delete right or join line' })
 map('t', '<Esc><Esc>', '<C-\\><C-n>', { silent = true, desc = 'Escape terminal mode' })
 
+-- Diagnostics and quickfix
 map('n', '[d', vim.diagnostic.goto_prev, { desc = 'Previous diagnostic' })
 map('n', ']d', vim.diagnostic.goto_next, { desc = 'Next diagnostic' })
 map('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Diagnostic float' })
+map('n', '<leader><C-q>', vim.diagnostic.setloclist, { desc = 'Diagnostic loclist' })
 map('n', ']q', '<cmd>cnext<CR>', { silent = true, desc = 'Next quickfix' })
 map('n', '[q', '<cmd>cprev<CR>', { silent = true, desc = 'Previous quickfix' })
 
+-- Clipboard
+map('v', '<S-y>', '"+y', { noremap = true, silent = true, desc = 'Yank to clipboard' })
+map('n', '<leader>y', 'ggVG"+y', { noremap = true, silent = true, desc = 'Yank whole file' })
+
+-- User commands
 vim.api.nvim_create_user_command('WQ', function()
   vim.cmd('wq!')
 end, { desc = 'Write and quit' })
