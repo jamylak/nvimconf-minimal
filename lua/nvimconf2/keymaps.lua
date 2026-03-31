@@ -59,6 +59,10 @@ local terminal = function(method)
 	return call("nvimconf2.actions.terminal", method)
 end
 
+local treesitter_select = function(method)
+	return call("nvimconf2.treesitter_select", method)
+end
+
 setup_terminal_keymaps()
 
 -- Commands
@@ -194,6 +198,10 @@ map("n", "qy", "yy", { silent = true, desc = "Yank line" })
 map("n", "qm", "v$", { silent = true, desc = "Visual to EOL" })
 map("n", "<C-;>", "g;", { silent = true, desc = "Previous change" })
 map("n", "<C-,>", "g,", { silent = true, desc = "Next change" })
+map("n", "qn", treesitter_select("select_current_node"), { silent = true, desc = "Treesitter select current node" })
+map("n", "vn", treesitter_select("select_current_node"), { silent = true, desc = "Treesitter select current node" })
+map("n", "qh", treesitter_select("select_parent_node"), { silent = true, desc = "Treesitter select parent node" })
+map("n", "vx", treesitter_select("select_parent_node"), { silent = true, desc = "Treesitter select parent node" })
 
 -- Insert mode
 map_each("i", { "ji", "jk" }, "<Esc>", { silent = true, desc = "Escape insert mode" })
@@ -250,6 +258,10 @@ map("n", "[q", "<cmd>cprev<CR>", { silent = true, desc = "Previous quickfix" })
 -- Clipboard
 map("v", "<S-y>", '"+y', { noremap = true, silent = true, desc = "Yank to clipboard" })
 map("n", "<leader>y", 'ggVG"+y', { noremap = true, silent = true, desc = "Yank whole file" })
+map("x", "J", treesitter_select("select_next_sibling"), { silent = true, desc = "Treesitter select next sibling" })
+map("x", "K", treesitter_select("select_prev_sibling"), { silent = true, desc = "Treesitter select previous sibling" })
+map("x", "H", treesitter_select("select_parent_visual"), { silent = true, desc = "Treesitter select parent" })
+map("x", "L", treesitter_select("select_child_visual"), { silent = true, desc = "Treesitter select child" })
 
 -- User commands
 vim.api.nvim_create_user_command("WQ", function()

@@ -1,6 +1,4 @@
 local M = {}
-
-local augroup = vim.api.nvim_create_augroup('nvimconf2.treesitter_select', { clear = true })
 local breadcrumbs_by_buf = {}
 local selected_node_by_buf = {}
 local esc_key = vim.keycode('<Esc>')
@@ -268,55 +266,6 @@ local function move_visual_selection(direction)
   select_node(target)
 end
 
-local function map(mode, lhs, rhs, desc, opts)
-  opts = opts or {}
-  opts.silent = opts.silent ~= false
-  opts.desc = desc
-  vim.keymap.set(mode, lhs, rhs, opts)
-end
-
-function M.setup()
-  vim.api.nvim_create_autocmd('FileType', {
-    group = augroup,
-    callback = function(args)
-      maybe_start(args.buf)
-    end,
-  })
-
-  vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI', 'BufLeave' }, {
-    group = augroup,
-    callback = function(args)
-      selected_node_by_buf[args.buf] = nil
-    end,
-  })
-
-  map('n', 'qn', function()
-    M.select_current_node()
-  end, 'Treesitter select current node')
-  map('n', 'vn', function()
-    M.select_current_node()
-  end, 'Treesitter select current node')
-  map('n', 'qh', function()
-    M.select_parent_node()
-  end, 'Treesitter select parent node')
-  map('n', 'vx', function()
-    M.select_parent_node()
-  end, 'Treesitter select parent node')
-
-  map('x', 'J', function()
-    M.select_next_sibling()
-  end, 'Treesitter select next sibling')
-  map('x', 'K', function()
-    M.select_prev_sibling()
-  end, 'Treesitter select previous sibling')
-  map('x', 'H', function()
-    M.select_parent_visual()
-  end, 'Treesitter select parent')
-  map('x', 'L', function()
-    M.select_child_visual()
-  end, 'Treesitter select child')
-end
-
 function M.select_current_node()
   select_node(current_node())
 end
@@ -349,5 +298,12 @@ end
 function M.select_prev_sibling()
   move_visual_selection('prev')
 end
+
+vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI', 'BufLeave' }, {
+  group = vim.api.nvim_create_augroup('nvimconf2.treesitter_select', { clear = true }),
+  callback = function(args)
+    selected_node_by_buf[args.buf] = nil
+  end,
+})
 
 return M
