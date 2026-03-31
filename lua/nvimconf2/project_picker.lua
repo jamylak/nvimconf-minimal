@@ -22,18 +22,33 @@ local function normalize(path)
   return vim.fs.normalize(vim.fn.fnamemodify(vim.fn.expand(path), ':p'))
 end
 
-local function projects_dir()
-  local default_root = normalize '~/proj'
-  if vim.fn.isdirectory(default_root) == 1 then
-    return default_root
+local function project_roots()
+  local roots = {}
+  local seen = {}
+
+  local function add(path)
+    local normalized = normalize(path)
+    if normalized == '' or seen[normalized] then
+      return
+    end
+    seen[normalized] = true
+    if vim.fn.isdirectory(normalized) == 1 then
+      roots[#roots + 1] = normalized
+    end
   end
 
+  add(vim.env.PROJECTS_DIR or '')
+  add '~/proj'
+
+  return roots
+end
+
+local function primary_project_root()
   local env_root = normalize(vim.env.PROJECTS_DIR or '')
-  if env_root ~= '' and vim.fn.isdirectory(env_root) == 1 then
+  if env_root ~= '' then
     return env_root
   end
-
-  return default_root
+  return normalize '~/proj'
 end
 
 local function current_buffer_has_name()
@@ -85,16 +100,17 @@ local function project_entries()
 
   add('/tmp', '/tmp')
 
-  local root = projects_dir()
-  local scandir = vim.uv.fs_scandir(root)
-  if scandir then
-    while true do
-      local name, entry_type = vim.uv.fs_scandir_next(scandir)
-      if not name then
-        break
-      end
-      if entry_type == 'directory' and name:sub(1, 1) ~= '.' then
-        add(root .. '/' .. name, name)
+  for _, root in ipairs(project_roots()) do
+    local scandir = vim.uv.fs_scandir(root)
+    if scandir then
+      while true do
+        local name, entry_type = vim.uv.fs_scandir_next(scandir)
+        if not name then
+          break
+        end
+        if entry_type == 'directory' and name:sub(1, 1) ~= '.' then
+          add(root .. '/' .. name, name)
+        end
       end
     end
   end
@@ -302,7 +318,7 @@ local function create_project()
     return
   end
 
-  local path = normalize(projects_dir() .. '/' .. query)
+  local path = normalize(primary_project_root() .. '/' .. query)
   vim.fn.mkdir(path, 'p')
   close()
   open_project(path, false)
