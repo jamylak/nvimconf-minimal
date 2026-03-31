@@ -1,4 +1,5 @@
 local M = {}
+local picker_history = require('nvimconf2.picker_history')
 
 -- Clear cached fff modules so a failed pre-install load can be retried cleanly.
 local function reset_modules()
@@ -140,6 +141,7 @@ end
 
 -- Open the normal fff file picker.
 local function find_files()
+  picker_history.set(find_files)
   reopen(function()
     require('fff').find_files()
   end)
@@ -147,13 +149,18 @@ end
 
 -- Back the :FFFFind command, preserving fff's query-vs-directory behavior.
 local function find_files_cmd(opts)
+  local args = opts.args or ''
+  picker_history.set(function()
+    find_files_cmd({ args = args })
+  end)
+
   reopen(function()
     local fff = require('fff')
-    if opts.args and opts.args ~= '' then
-      if vim.fn.isdirectory(opts.args) == 1 then
-        fff.find_files_in_dir(opts.args)
+    if args ~= '' then
+      if vim.fn.isdirectory(args) == 1 then
+        fff.find_files_in_dir(args)
       else
-        fff.search_and_show(opts.args)
+        fff.search_and_show(args)
       end
     else
       fff.find_files()
@@ -163,6 +170,10 @@ end
 
 -- Open fff live grep, optionally carrying over query/cwd from the picker.
 local function live_grep(query, cwd)
+  picker_history.set(function()
+    live_grep(query, cwd)
+  end)
+
   reopen(function()
     require('fff').live_grep({
       cwd = cwd,
@@ -175,6 +186,10 @@ local function live_grep(query, cwd)
 end
 
 local function find_files_in_dir(path)
+  picker_history.set(function()
+    find_files_in_dir(path)
+  end)
+
   reopen(function()
     require('fff').find_files_in_dir(path)
   end)

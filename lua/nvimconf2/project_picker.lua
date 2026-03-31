@@ -1,4 +1,5 @@
 local M = {}
+local picker_history = require('nvimconf2.picker_history')
 
 local ns = vim.api.nvim_create_namespace('nvimconf2.project_picker')
 
@@ -361,6 +362,8 @@ local function create_window(buf, opts)
 end
 
 function M.open()
+  picker_history.set(M.open)
+
   if state.active then
     if state.prompt_win and vim.api.nvim_win_is_valid(state.prompt_win) then
       vim.api.nvim_set_current_win(state.prompt_win)
