@@ -111,8 +111,6 @@ map('n', '<C-s>', function()
 end, { silent = true, noremap = true, desc = 'Search' })
 map('n', '[<Space>', 'O<Esc>j', { silent = true, desc = 'Line above' })
 map('n', ']<Space>', 'o<Esc>k', { silent = true, desc = 'Line below' })
-
-
 map('n', 'qp', 'yyp', { silent = true, desc = 'Duplicate line' })
 map('n', '<C-p>', 'yyp', { silent = true, desc = 'Duplicate line' })
 map('v', 'q', '$h', { silent = true, desc = 'End of line' })
@@ -134,6 +132,7 @@ end
 
 map('i', '<C-k>', edit.check_and_delete, { expr = true, noremap = true, desc = 'Delete right or join line' })
 map('i', '<C-y>', '<C-r>+', { silent = true, desc = 'Paste clipboard' })
+map('i', '<a-m>', '<C-r>+', { silent = true, desc = 'Paste clipboard' })
 map('n', '<a-m>', '"+p', { silent = true, desc = 'Paste clipboard' })
 map('v', '<a-m>', '"+p', { silent = true, desc = 'Paste clipboard' })
 map('i', '<C-f>', '<Right>', { silent = true, desc = 'Right' })
