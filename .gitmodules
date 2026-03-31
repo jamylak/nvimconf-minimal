@@ -4,3 +4,6 @@
 [submodule "pack/vendor/opt/blink.cmp"]
 	path = pack/vendor/opt/blink.cmp
 	url = https://github.com/saghen/blink.cmp.git
+[submodule "pack/vendor/opt/grug-far.nvim"]
+	path = pack/vendor/opt/grug-far.nvim
+	url = https://github.com/MagicDuck/grug-far.nvim.git
