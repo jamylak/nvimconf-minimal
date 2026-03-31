@@ -3,7 +3,7 @@ local opt = vim.opt
 opt.ignorecase = true
 opt.smartcase = true
 opt.number = true
-opt.mouse = ''
+opt.mouse = ""
 opt.swapfile = false
 opt.backup = false
 opt.writebackup = false
@@ -11,5 +11,7 @@ opt.updatetime = 200
 opt.timeoutlen = 300
 opt.splitbelow = true
 opt.splitright = true
+opt.cursorline = true
+opt.signcolumn = "yes"
 
-vim.opt.shadafile = 'NONE'
+vim.opt.shadafile = "NONE"
