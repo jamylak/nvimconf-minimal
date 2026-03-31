@@ -1,127 +1,14 @@
 local map = vim.keymap.set
 
-local function write_current()
-  vim.cmd.write()
-end
+local edit = require('nvimconf2.actions.edit')
+local git = require('nvimconf2.actions.git')
+local external = require('nvimconf2.actions.external')
+local terminal = require('nvimconf2.actions.terminal')
 
-local function terminal_new_tab()
-  vim.cmd '-tabnew | term'
-  vim.cmd 'startinsert'
-end
+terminal.setup()
 
-local function terminal_vertical()
-  vim.cmd 'vsplit | term'
-  vim.cmd 'startinsert'
-end
-
-local function terminal_horizontal()
-  vim.cmd 'split | term'
-  vim.cmd 'startinsert'
-end
-local function send_terminal_repeat(initial_command)
-  vim.cmd.write()
-
-  local terminal_buffer = find_terminal_buffer_number()
-  if terminal_buffer ~= nil then
-    local ok, chan = pcall(vim.api.nvim_buf_get_var, terminal_buffer, 'terminal_job_id')
-    if ok and chan then
-      vim.fn.chansend(chan, initial_command or 'r\r')
-      scroll_buffer_to_bottom(terminal_buffer)
-    end
-    return
-  end
-
-  local bufname = vim.api.nvim_buf_get_name(0)
-  vim.cmd 'split | term'
-
-  if bufname:match '%.py$' then
-    vim.cmd 'wincmd p'
-    vim.defer_fn(function()
-      send_terminal_repeat('python3 ' .. bufname .. ' \r')
-    end, 220)
-  else
-    vim.cmd 'startinsert'
-  end
-end
-
-local function yank_to_clipboard()
-  vim.fn.setreg('+', vim.fn.getreg '"')
-end
-
-local function git_root()
-  local result = vim.system({ 'git', 'rev-parse', '--show-toplevel' }, { text = true }):wait()
-  if result.code ~= 0 then
-    vim.notify('Not inside a git repo', vim.log.levels.WARN)
-    return nil
-  end
-  return vim.trim(result.stdout or '')
-end
-
-local function cd_to_git_root()
-  local root = git_root()
-  if root then
-    vim.cmd.cd(vim.fn.fnameescape(root))
-  end
-end
-
-local function tcd_to_git_root()
-  local root = git_root()
-  if root then
-    vim.cmd.tcd(vim.fn.fnameescape(root))
-  end
-end
-
-local function github_url()
-  local root = git_root()
-  if not root then
-    return nil
-  end
-
-  local file = vim.fn.expand '%:p'
-  if file == '' then
-    vim.notify('No file path for current buffer', vim.log.levels.WARN)
-    return nil
-  end
-
-  local rel_path = vim.fs.relpath(root, file)
-  if not rel_path then
-    vim.notify('Current file is outside git root', vim.log.levels.WARN)
-    return nil
-  end
-
-  local remote = vim.system({ 'git', '-C', root, 'config', '--get', 'remote.origin.url' }, { text = true }):wait()
-  local branch = vim.system({ 'git', '-C', root, 'rev-parse', '--abbrev-ref', 'HEAD' }, { text = true }):wait()
-  if remote.code ~= 0 or branch.code ~= 0 then
-    vim.notify('Failed to resolve git remote or branch', vim.log.levels.ERROR)
-    return nil
-  end
-
-  local remote_url = vim.trim(remote.stdout or '')
-  if remote_url:find 'git@' then
-    remote_url = remote_url:gsub(':', '/'):gsub('git@', 'https://'):gsub('%.git$', '')
-  elseif remote_url:find 'https://' then
-    remote_url = remote_url:gsub('%.git$', '')
-  end
-
-  return string.format('%s/blob/%s/%s#L%d', remote_url, vim.trim(branch.stdout or ''), rel_path, vim.fn.line '.')
-end
-
-local function copy_github_url()
-  local url = github_url()
-  if url then
-    vim.fn.setreg('+', url)
-    vim.notify('GitHub URL copied', vim.log.levels.INFO)
-  end
-end
-
-local function launch_github_url()
-  local url = github_url()
-  if url then
-    vim.fn.setreg('+', url)
-    vim.system({ 'open', url }, { detach = true })
-  end
-end
-
+-- Commands
+map('n', '<leader>m', '<cmd>make<CR>', { silent = true, desc = 'Run make' })
 map('n', '<leader>q', '<cmd>q!<CR>', { silent = true, desc = 'Quit' })
 map('n', '<leader><leader>q', '<cmd>qall!<CR>', { silent = true, desc = 'Quit all' })
 map('n', '<leader>Q', '<cmd>qall!<CR>', { silent = true, desc = 'Quit all' })
