@@ -12,6 +12,12 @@ local function open_project_picker()
 	require("nvimconf2.project_picker").open()
 end
 
+local function call_diagnostic(method)
+	return function()
+		return vim.diagnostic[method]()
+	end
+end
+
 -- Commands
 map("n", "<leader>m", "<cmd>make<CR>", { silent = true, desc = "Run make" })
 map("n", "<leader>q", "<cmd>q!<CR>", { silent = true, desc = "Quit" })
@@ -211,10 +217,10 @@ map("n", "<leader>th", terminal.horizontal, { desc = "Terminal horizontal" })
 map("n", "<leader>n", terminal.send_repeat, { desc = "Send repeat to terminal" })
 
 -- Diagnostics and quickfix
-map("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Diagnostic float" })
-map("n", "<leader><C-q>", vim.diagnostic.setloclist, { desc = "Diagnostic loclist" })
+map("n", "[d", call_diagnostic("goto_prev"), { desc = "Previous diagnostic" })
+map("n", "]d", call_diagnostic("goto_next"), { desc = "Next diagnostic" })
+map("n", "<leader>e", call_diagnostic("open_float"), { desc = "Diagnostic float" })
+map("n", "<leader><C-q>", call_diagnostic("setloclist"), { desc = "Diagnostic loclist" })
 map("n", "]q", "<cmd>cnext<CR>", { silent = true, desc = "Next quickfix" })
 map("n", "[q", "<cmd>cprev<CR>", { silent = true, desc = "Previous quickfix" })
 
