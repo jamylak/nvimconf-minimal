@@ -174,6 +174,19 @@ local function live_grep(query, cwd)
   end)
 end
 
+local function find_files_in_dir(path)
+  reopen(function()
+    require('fff').find_files_in_dir(path)
+  end)
+end
+
+local function close_picker()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if ok and picker_ui.state and picker_ui.state.active then
+    picker_ui.close()
+  end
+end
+
 -- Register user-facing commands, keymaps, and picker-local mappings.
 function M.setup(enabled)
   if not enabled then
@@ -220,6 +233,14 @@ function M.setup(enabled)
         vim.cmd.stopinsert()
         live_grep(query, cwd)
       end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF live grep' })
+
+      vim.keymap.set('i', '<m-n>', function()
+        vim.cmd.stopinsert()
+        close_picker()
+        vim.schedule(function()
+          require('nvimconf2.project_picker').open()
+        end)
+      end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF project picker' })
     end,
   })
 
@@ -227,5 +248,10 @@ function M.setup(enabled)
   vim.keymap.set('n', '<m-u>', live_grep, { desc = 'Project grep' })
   vim.keymap.set('n', '<leader>f', find_files, { desc = 'Find files' })
 end
+
+M.close = close_picker
+M.find_files = find_files
+M.find_files_in_dir = find_files_in_dir
+M.live_grep = live_grep
 
 return M

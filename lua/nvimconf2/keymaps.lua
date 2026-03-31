@@ -8,6 +8,10 @@ local window_picker = require("nvimconf2.window_picker")
 
 terminal.setup()
 
+local function open_project_picker()
+	require("nvimconf2.project_picker").open()
+end
+
 -- Commands
 map("n", "<leader>m", "<cmd>make<CR>", { silent = true, desc = "Run make" })
 map("n", "<leader>q", "<cmd>q!<CR>", { silent = true, desc = "Quit" })
@@ -76,6 +80,7 @@ map("n", "m", "<C-W><C-W>", { silent = true, desc = "Next window" })
 map("n", "M", "<C-W>W", { silent = true, desc = "Previous window" })
 map("n", "gw", "<C-W><C-W>", { silent = true, desc = "Next window" })
 map("n", "qw", "<C-W><C-O>", { silent = true, desc = "Only window" })
+map("n", "<m-n>", open_project_picker, { silent = true, desc = "Switch project" })
 map("n", "<leader>bd", "<cmd>bd!<CR>", { silent = true, desc = "Delete buffer" })
 map("n", "sb", "<cmd>b#<CR>", { silent = true, desc = "Swap buffer" })
 map("n", "sj", "<cmd>b#<CR>", { silent = true, desc = "Swap buffer" })
@@ -182,9 +187,17 @@ map("i", "<A-S-[>", "<C-o>{", { silent = true, desc = "Prev paragraph" })
 map("i", "<A-S-]>", "<C-o>}", { silent = true, desc = "Next paragraph" })
 map("i", "<A-S-,>", "<C-o>go", { silent = true, desc = "Insert new line below" })
 map("i", "<A-S-.>", "<Esc>G$a", { silent = true, desc = "End of file insert" })
+map("i", "<m-n>", function()
+	vim.cmd.stopinsert()
+	open_project_picker()
+end, { silent = true, desc = "Switch project" })
 
 -- Terminal
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { silent = true, desc = "Escape terminal mode" })
+map("t", "<m-n>", function()
+	vim.cmd.stopinsert()
+	open_project_picker()
+end, { silent = true, desc = "Switch project" })
 map("n", "<leader>tn", ":tabnew<CR>", { silent = true, desc = "New tab" })
 map("n", "<a-t>", ":split<CR><C-w>T", { silent = true, desc = "New tab" })
 map("n", "<c-t>", ":tabnew<CR>", { silent = true, desc = "New tab" })
