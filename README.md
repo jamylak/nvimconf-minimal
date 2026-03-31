@@ -12,8 +12,15 @@ git submodule update --init --recursive
 
 The `fff.nvim` native binary auto-installs on first use. If you want to do it manually instead, run `:FFFInstall`.
 
-Try it:
+Alternative Launch:
+
+1. Recommended: put this repo at `~/.config/nvimconf2` or symlink it there, then launch with `NVIM_APPNAME` only.
 
 ```sh
-XDG_CONFIG_HOME=/Users/james/proj NVIM_APPNAME=nvimconf2 nvim /Users/james/proj/vsdf -c "FFFFind"
+ln -s /Users/james/proj/nvimconf2 ~/.config/nvimconf2
+```
+2. Run it
+
+```sh
+NVIM_APPNAME=nvimconf2 nvim /Users/james/proj/vsdf -c "FFFFind"
 ```
