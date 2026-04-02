@@ -2,3 +2,4 @@
 .state/nvim
 startuptime-nvimconf2.log
 .state/nvimconf2
+.cache-test/nvim/luac
