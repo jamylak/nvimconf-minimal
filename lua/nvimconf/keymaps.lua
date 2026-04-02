@@ -86,7 +86,7 @@ map("n", "<leader>|", external("yazi_vsplit_current_file"), { silent = true, des
 map("n", "<leader>I", external("yazi_current_file_new_tab"), { silent = true, desc = "Yazi new tab" })
 
 -- Comments
-map_each("n", { "co", "<C-c>" }, "gcc", { remap = true, silent = true, desc = "Toggle line comment" })
+map("n", "<C-c>", "gcc", { remap = true, silent = true, desc = "Toggle line comment" })
 map_each("x", { "<leader>c", "<C-c>" }, "gc", { remap = true, silent = true, desc = "Toggle comment" })
 
 -- Cwd and repo helpers
