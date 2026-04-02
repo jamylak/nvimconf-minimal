@@ -85,6 +85,10 @@ map("n", "<leader>\\", external("yazi_hsplit_current_file"), { silent = true, de
 map("n", "<leader>|", external("yazi_vsplit_current_file"), { silent = true, desc = "Yazi vertical split" })
 map("n", "<leader>I", external("yazi_current_file_new_tab"), { silent = true, desc = "Yazi new tab" })
 
+-- Comments
+map('n', '<C-c>', 'gcc', { silent = true })
+map_each("x", { "<leader>c", "<C-c>" }, "gc", { remap = true, silent = true, desc = "Toggle comment" })
+
 -- Cwd and repo helpers
 map_each("n", { "cd", "<leader>tc" }, git("change_dir_tab"), { desc = "Tab cwd to current file dir" })
 map("n", "<leader>lc", git("change_dir_window"), { desc = "Window cwd to current file dir" })
