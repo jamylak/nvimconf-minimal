@@ -94,6 +94,7 @@ map_each("n", { "cd", "<leader>tc" }, git("change_dir_tab"), { desc = "Tab cwd t
 map("n", "<leader>lc", git("change_dir_window"), { desc = "Window cwd to current file dir" })
 map("n", "<leader>v", git("tcd_to_git_root"), { noremap = true, desc = "Tab cwd to git root" })
 map("n", "<leader>V", git("cd_to_git_root"), { noremap = true, desc = "Cwd to git root" })
+map("n", "gh", git("goto_next_hunk"), { desc = "Next git change" })
 map("n", "<leader><leader>G", git("copy_github_url"), { desc = "Copy GitHub URL" })
 map("n", "<leader><leader>g", git("launch_github_url"), { desc = "Open GitHub URL" })
 
