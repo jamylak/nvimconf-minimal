@@ -43,6 +43,44 @@ local function call_diagnostic(method)
 	end
 end
 
+local function resize_split(direction, amount)
+	amount = amount or 3
+
+	return function()
+		local current_winnr = vim.fn.winnr()
+		local left_winnr = vim.fn.winnr("h")
+		local right_winnr = vim.fn.winnr("l")
+		local up_winnr = vim.fn.winnr("k")
+		local down_winnr = vim.fn.winnr("j")
+
+		if direction == "h" then
+			if left_winnr ~= current_winnr then
+				vim.fn.win_move_separator(vim.fn.win_getid(left_winnr), -amount)
+			elseif right_winnr ~= current_winnr then
+				vim.fn.win_move_separator(0, -amount)
+			end
+		elseif direction == "j" then
+			if down_winnr ~= current_winnr then
+				vim.fn.win_move_statusline(0, amount)
+			elseif up_winnr ~= current_winnr then
+				vim.fn.win_move_statusline(vim.fn.win_getid(up_winnr), amount)
+			end
+		elseif direction == "k" then
+			if up_winnr ~= current_winnr then
+				vim.fn.win_move_statusline(vim.fn.win_getid(up_winnr), -amount)
+			elseif down_winnr ~= current_winnr then
+				vim.fn.win_move_statusline(0, -amount)
+			end
+		elseif direction == "l" then
+			if right_winnr ~= current_winnr then
+				vim.fn.win_move_separator(0, amount)
+			elseif left_winnr ~= current_winnr then
+				vim.fn.win_move_separator(vim.fn.win_getid(left_winnr), amount)
+			end
+		end
+	end
+end
+
 local function search_prompt()
 	vim.fn.feedkeys(vim.api.nvim_replace_termcodes("/", true, true, true), "n")
 end
@@ -138,6 +176,10 @@ end, { silent = true, desc = "Jump to window" })
 map_each("n", { "<a-d>", "m" }, "<C-W><C-W>", { silent = true, desc = "Next window" })
 map("n", "M", "<C-W>W", { silent = true, desc = "Previous window" })
 map("n", "qw", "<C-W><C-O>", { silent = true, desc = "Only window" })
+map("n", "<a-h>", resize_split("h"), { silent = true, desc = "Resize split left" })
+map("n", "<a-j>", resize_split("j"), { silent = true, desc = "Resize split down" })
+map("n", "<a-k>", resize_split("k"), { silent = true, desc = "Resize split up" })
+map("n", "<a-l>", resize_split("l"), { silent = true, desc = "Resize split right" })
 map("n", "<m-n>", open_project_picker, { silent = true, desc = "Switch project" })
 map("n", "<m-cr>", reopen_last_picker, { silent = true, desc = "Reopen last picker" })
 map("n", "<leader>bd", "<cmd>bd!<CR>", { silent = true, desc = "Delete buffer" })
