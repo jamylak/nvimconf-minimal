@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 M.favorite_languages = {
   "lua",
@@ -75,23 +76,7 @@ local function parser_installed(lang)
 end
 
 local function load_nvim_treesitter()
-  local ok = pcall(vim.cmd, "packadd nvim-treesitter")
-  if not ok then
-    vim.schedule(function()
-      vim.notify("nvim-treesitter is missing. Run: git submodule update --init --recursive", vim.log.levels.ERROR)
-    end)
-    return nil
-  end
-
-  local ok_require, ts = pcall(require, "nvim-treesitter")
-  if not ok_require then
-    vim.schedule(function()
-      vim.notify("Failed to load nvim-treesitter", vim.log.levels.ERROR)
-    end)
-    return nil
-  end
-
-  return ts
+  return bootstrap.require_plugin('nvim-treesitter', 'nvim-treesitter')
 end
 
 local function available_favorites(ts)

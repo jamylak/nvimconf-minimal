@@ -1,13 +1,23 @@
 # nvimconf2
 
-Tiny Neovim config with one plugin only: `fff.nvim` as a native package submodule, no package manager.
+Tiny Neovim config for current Neovim, using builtin `vim.pack` for plugin management.
 
 Main bindings: `:FFFFind`, `<C-Return>` for files, `<M-u>` for grep.
 
-One-time setup after clone:
+Requirements:
 
 ```sh
-git submodule update --init --recursive
+git
+neovim 0.12.0+
+```
+
+On first start, Neovim installs managed plugins through `vim.pack`.
+
+If plugin install fails, run:
+
+```vim
+:lua vim.pack.update()
+:restart
 ```
 
 The `fff.nvim` native binary auto-installs on first use. If you want to do it manually instead, run `:FFFInstall`.

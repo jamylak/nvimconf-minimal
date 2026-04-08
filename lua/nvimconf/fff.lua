@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 local picker_history = require('nvimconf.picker_history')
 
 local function normalize_query(query)
@@ -11,6 +12,15 @@ end
 
 local open_file_picker
 local live_grep
+
+local function require_fff(module_name)
+  local module = bootstrap.require_plugin(module_name, 'fff.nvim')
+  if not module then
+    return nil
+  end
+
+  return module
+end
 
 -- Clear cached fff modules so a failed pre-install load can be retried cleanly.
 local function reset_modules()
@@ -110,7 +120,10 @@ end
 
 -- Ensure the native backend exists before any fff UI code tries to require it.
 local function ensure_binary()
-  local download = require('fff.download')
+  local download = require_fff('fff.download')
+  if not download then
+    return false
+  end
   local binary_path = download.get_binary_path()
   local stat = vim.uv.fs_stat(binary_path)
   if stat and stat.type == 'file' then
@@ -292,11 +305,7 @@ local function close_picker()
 end
 
 -- Register user-facing commands, keymaps, and picker-local mappings.
-function M.setup(enabled)
-  if not enabled then
-    return
-  end
-
+function M.setup()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
   vim.api.nvim_create_user_command('FFFFind', find_files_cmd, {
     nargs = '?',
@@ -321,7 +330,11 @@ function M.setup(enabled)
   })
 
   vim.api.nvim_create_user_command('FFFInstall', function()
-    require('fff.download').download_or_build_binary()
+    local download = require_fff('fff.download')
+    if not download then
+      return
+    end
+    download.download_or_build_binary()
   end, {
     desc = 'Download or build the fff.nvim binary',
   })

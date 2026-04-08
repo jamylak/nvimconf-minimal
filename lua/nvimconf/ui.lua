@@ -1,10 +1,6 @@
 local M = {}
 
 function M.setup()
-  if vim.fn.has("nvim-0.12") == 0 then
-    return
-  end
-
   local ok, ui2 = pcall(require, "vim._core.ui2")
   if not ok then
     return

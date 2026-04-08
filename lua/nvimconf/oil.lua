@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
@@ -28,16 +29,10 @@ local function set_global_keymaps()
   map('n', '<leader>od', '<CMD>Oil ' .. home .. '/.config/dotfiles<CR>', { desc = '[O]pen [D]otfiles' })
   map('n', '<leader>ot', '<CMD>Oil /tmp<CR>', { desc = '[O]pen /[T]mp' })
   map('n', '<leader>oc', '<CMD>Oil ' .. config_dir .. '<CR>', { desc = '[O]pen [N]eovim Config' })
-  map('n', '<leader>on', '<CMD>Oil ' .. config_dir .. '/pack/vendor/opt<CR>', { desc = '[O]pen [N]eovim Plugins Folder' })
+  map('n', '<leader>on', '<CMD>Oil ' .. bootstrap.plugins_dir .. '<CR>', { desc = '[O]pen [N]eovim Plugins Folder' })
   map('n', '<leader>op', '<CMD>Oil ' .. home .. '/proj<CR>', { desc = '[O]pen Projects' })
   map('n', '-', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
   map('n', '<c-x><c-j>', '<CMD>Oil<CR>', { desc = 'Open parent directory' })
-end
-
-local function notify_missing()
-  vim.schedule(function()
-    vim.notify('oil.nvim is missing. Run: git submodule update --init --recursive', vim.log.levels.ERROR)
-  end)
 end
 
 local function load()
@@ -45,15 +40,14 @@ local function load()
     return true
   end
 
-  local ok = pcall(vim.cmd, 'packadd oil.nvim')
-  if not ok then
-    notify_missing()
+  local oil = bootstrap.require_plugin('oil', 'oil.nvim')
+  if not oil then
     return false
   end
 
   pcall(vim.api.nvim_del_user_command, 'Oil')
 
-  require('oil').setup({
+  oil.setup({
     default_file_explorer = true,
     columns = {
       'icon',

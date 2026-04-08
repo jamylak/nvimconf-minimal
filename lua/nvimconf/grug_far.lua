@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
@@ -7,15 +8,12 @@ local function ensure_loaded()
     return true
   end
 
-  local ok = pcall(vim.cmd, 'packadd grug-far.nvim')
-  if not ok then
-    vim.schedule(function()
-      vim.notify('grug-far.nvim is missing. Run: git submodule update --init --recursive', vim.log.levels.ERROR)
-    end)
+  local grug_far = bootstrap.require_plugin('grug-far', 'grug-far.nvim')
+  if not grug_far then
     return false
   end
 
-  require('grug-far').setup({
+  grug_far.setup({
     keymaps = {
       qflist = { n = 'q' },
       close = { n = '<localleader>q' },

@@ -1,20 +1,14 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 local snacks_loaded = false
 
 local function ensure_snacks_lazygit()
-  local repo_root = vim.fn.fnamemodify(debug.getinfo(1, 'S').source:sub(2), ':h:h:h')
-  if not vim.tbl_contains(vim.opt.packpath:get(), repo_root) then
-    vim.opt.packpath:prepend(repo_root)
-  end
-
-  local ok = pcall(vim.cmd, 'packadd snacks.nvim')
-  if not ok then
-    vim.notify('snacks.nvim is missing', vim.log.levels.ERROR)
+  local snacks = bootstrap.require_plugin('snacks', 'snacks.nvim')
+  if not snacks then
     return nil
   end
 
-  local snacks = require 'snacks'
   if not snacks_loaded then
     snacks.setup({
       lazygit = {},

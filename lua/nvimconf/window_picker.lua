@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
@@ -7,15 +8,12 @@ local function ensure_loaded()
     return true
   end
 
-  local ok = pcall(vim.cmd, 'packadd nvim-window')
-  if not ok then
-    vim.schedule(function()
-      vim.notify('nvim-window is missing. Run: git submodule update --init --recursive', vim.log.levels.ERROR)
-    end)
+  local nvim_window = bootstrap.require_plugin('nvim-window', 'nvim-window')
+  if not nvim_window then
     return false
   end
 
-  require('nvim-window').setup({
+  nvim_window.setup({
     chars = {
       'i',
       'o',

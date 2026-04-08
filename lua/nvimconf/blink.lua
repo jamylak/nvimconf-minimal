@@ -1,4 +1,5 @@
 local M = {}
+local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
@@ -7,17 +8,12 @@ local function setup_blink()
     return
   end
 
-  -- Important: keep the blink.cmp submodule on a real release tag if you want
-  -- the fast Rust fuzzy matcher to resolve via prebuilt binaries cleanly.
-  local ok = pcall(vim.cmd, 'packadd blink.cmp')
-  if not ok then
-    vim.schedule(function()
-      vim.notify('blink.cmp is missing. Run: git submodule update --init --recursive', vim.log.levels.ERROR)
-    end)
+  local blink = bootstrap.require_plugin('blink.cmp', 'blink.cmp')
+  if not blink then
     return
   end
 
-  require('blink.cmp').setup({
+  blink.setup({
     keymap = {
       preset = 'none',
       ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
@@ -34,8 +30,10 @@ local function setup_blink()
         enabled = false,
       },
       prebuilt_binaries = {
-        -- Important: allow Blink to fetch its release-matched Rust fuzzy binary automatically.
+        -- Force the downloader to use the stable v1 release line even if the
+        -- checked out plugin revision is not itself on a release tag yet.
         download = true,
+        force_version = 'v1.*',
       },
     },
     snippets = {
