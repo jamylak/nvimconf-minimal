@@ -7,6 +7,7 @@ local function treesitter_install(method)
 end
 
 require("nvimconf.options")
+require("nvimconf.ui").setup()
 require("nvimconf.theme").apply()
 require("nvimconf.oil").setup()
 require("nvimconf.keymaps")
