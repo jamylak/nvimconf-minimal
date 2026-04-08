@@ -17,3 +17,6 @@
 [submodule "pack/vendor/opt/nvim-treesitter"]
 	path = pack/vendor/opt/nvim-treesitter
 	url = https://github.com/nvim-treesitter/nvim-treesitter.git
+[submodule "pack/vendor/opt/snacks.nvim"]
+	path = pack/vendor/opt/snacks.nvim
+	url = https://github.com/folke/snacks.nvim.git

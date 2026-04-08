@@ -55,6 +55,10 @@ local git = function(method)
 	return call("nvimconf.actions.git", method)
 end
 
+local lazygit = function(method)
+	return call("nvimconf.actions.lazygit", method)
+end
+
 local external = function(method)
 	return call("nvimconf.actions.external", method)
 end
@@ -114,6 +118,7 @@ map("v", "<leader><leader>r", external("execute_visual_selection_as_lua"), {
 map("n", "<leader><leader>s", "<cmd>source %<CR>", { noremap = true, desc = "Source current Lua file" })
 map("n", "<A-y>", external("yazi_here"), { noremap = true, silent = true, desc = "Open yazi" })
 map("n", "<C-y>", external("yazi_new_tab"), { noremap = true, silent = true, desc = "Open yazi in new tab" })
+map("n", "<C-g>", lazygit("open"), { noremap = true, silent = true, desc = "Open lazygit" })
 
 -- Windows and buffers
 map("n", "gj", pick_window, { silent = true, desc = "Jump to window" })
