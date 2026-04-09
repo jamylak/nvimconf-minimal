@@ -15,6 +15,7 @@ require("nvimconf.fff").setup()
 require("nvimconf.grug_far").setup()
 require("nvimconf.lsp").setup()
 require("nvimconf.blink").setup()
+require("nvimconf.cplug").setup()
 
 vim.api.nvim_create_user_command(
   "TSInstallFavorites",

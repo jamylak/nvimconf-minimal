@@ -22,9 +22,29 @@ local function gh(repo)
 end
 
 M.plugins_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt')
+M.cplug_dir = vim.fn.expand('~/proj/cplug.nvim')
+
+local function add_local_runtimepath(path)
+  local stat = vim.uv.fs_stat(path)
+  if not stat or stat.type ~= 'directory' then
+    return false
+  end
+
+  vim.opt.rtp:prepend(path)
+  return true
+end
+
+-- Use the local checkout directly while iterating on cplug.nvim.
+add_local_runtimepath(M.cplug_dir)
 
 local function specs()
   return {
+    { src = gh('mfussenegger/nvim-dap'), name = 'nvim-dap' },
+    { src = gh('nvim-neotest/nvim-nio'), name = 'nvim-nio' },
+    { src = gh('rcarriga/nvim-dap-ui'), name = 'nvim-dap-ui' },
+    { src = gh('Jorenar/nvim-dap-disasm'), name = 'nvim-dap-disasm' },
+    -- Uncomment this and remove the local runtimepath line above to use GitHub instead.
+    -- { src = gh('jamylak/cplug.nvim'), name = 'cplug.nvim' },
     { src = gh('dmtrKovalenko/fff.nvim'), name = 'fff.nvim' },
     { src = gh('Saghen/blink.cmp'), name = 'blink.cmp', version = vim.version.range('1') },
     { src = gh('MagicDuck/grug-far.nvim'), name = 'grug-far.nvim' },
