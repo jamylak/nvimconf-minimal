@@ -3,10 +3,7 @@ local opt = vim.opt
 opt.ignorecase = true
 opt.smartcase = true
 opt.number = true
-opt.mouse = ""
 opt.swapfile = false
-opt.backup = false
-opt.writebackup = false
 opt.updatetime = 200
 opt.timeoutlen = 300
 opt.splitbelow = true
@@ -17,5 +14,3 @@ opt.signcolumn = "yes"
 -- ui2 makes cmdheight=0 viable enough to hide the command area without
 -- falling back to the old press-enter message flow.
 opt.cmdheight = 0
-
-vim.opt.shadafile = "NONE"
