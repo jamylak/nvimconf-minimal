@@ -23,6 +23,7 @@ end
 
 M.plugins_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt')
 M.cplug_dir = vim.fn.expand('~/proj/cplug.nvim')
+M.penguin_dir = vim.fn.expand('~/proj/penguin.nvim')
 
 local function add_local_runtimepath(path)
   local stat = vim.uv.fs_stat(path)
@@ -36,6 +37,8 @@ end
 
 -- Use the local checkout directly while iterating on cplug.nvim.
 add_local_runtimepath(M.cplug_dir)
+-- Use the local checkout directly while iterating on penguin.nvim.
+add_local_runtimepath(M.penguin_dir)
 
 local function specs()
   return {
@@ -45,6 +48,8 @@ local function specs()
     { src = gh('Jorenar/nvim-dap-disasm'), name = 'nvim-dap-disasm' },
     -- Uncomment this and remove the local runtimepath line above to use GitHub instead.
     -- { src = gh('jamylak/cplug.nvim'), name = 'cplug.nvim' },
+    -- Uncomment this and remove the local runtimepath line above to use GitHub instead.
+    -- { src = gh('jamylak/penguin.nvim'), name = 'penguin.nvim' },
     { src = gh('dmtrKovalenko/fff.nvim'), name = 'fff.nvim' },
     { src = gh('Saghen/blink.cmp'), name = 'blink.cmp', version = vim.version.range('1') },
     { src = gh('MagicDuck/grug-far.nvim'), name = 'grug-far.nvim' },
