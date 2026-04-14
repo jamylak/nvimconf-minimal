@@ -37,6 +37,10 @@ local function reopen_last_picker()
 	require("nvimconf.picker_history").reopen()
 end
 
+local function open_penguin()
+	require("nvimconf.penguin").open()
+end
+
 local function call_diagnostic(method)
 	return function()
 		return vim.diagnostic[method]()
@@ -181,7 +185,7 @@ map("n", "<a-j>", resize_split("j"), { silent = true, desc = "Resize split down"
 map("n", "<a-k>", resize_split("k"), { silent = true, desc = "Resize split up" })
 map("n", "<a-l>", resize_split("l"), { silent = true, desc = "Resize split right" })
 map("n", "<m-n>", open_project_picker, { silent = true, desc = "Switch project" })
-map("n", "<m-cr>", reopen_last_picker, { silent = true, desc = "Reopen last picker" })
+map("n", "<m-cr>", open_penguin, { silent = true, desc = "Command history" })
 map("n", "<leader>bd", "<cmd>bd!<CR>", { silent = true, desc = "Delete buffer" })
 map_each("n", { "sb", "sj" }, "<cmd>b#<CR>", { silent = true, desc = "Swap buffer" })
 map("n", "sk", "<cmd>tabnext#<CR>", { silent = true, desc = "Swap tab" })
