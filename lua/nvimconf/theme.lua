@@ -57,7 +57,7 @@ function M.apply()
 	end
 
 	vim.o.termguicolors = true
-	vim.g.colors_name = "nvimconf2"
+	vim.g.colors_name = "nvimconf-minimal"
 	vim.opt.fillchars:append({ eob = " " })
 
 	local blink_border = blend(p.bg_highlight, p.grey, 0.7)

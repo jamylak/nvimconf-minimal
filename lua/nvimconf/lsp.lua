@@ -57,7 +57,7 @@ local function runtime()
 end
 
 function M.setup()
-  local group = vim.api.nvim_create_augroup('nvimconf2-lsp-start', { clear = true })
+  local group = vim.api.nvim_create_augroup('nvimconf-minimal-lsp-start', { clear = true })
   vim.api.nvim_create_autocmd('FileType', {
     group = group,
     pattern = lsp_filetypes,

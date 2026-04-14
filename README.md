@@ -1,6 +1,8 @@
-# nvimconf2
+# nvimconf-minimal
 
-Tiny Neovim config for current Neovim, using builtin `vim.pack` for plugin management.
+🚧 Work in progress. I am still fixing it.
+
+Minimal Neovim config focused on migrating `jamylak/nvimconf`, supporting Neovim `0.12.0+`, and staying faster and simpler by using builtin `vim.pack` for plugin management.
 
 Main bindings: `:FFFFind`, `<C-Return>` for files, `<M-u>` for grep.
 
@@ -24,13 +26,13 @@ The `fff.nvim` native binary auto-installs on first use. If you want to do it ma
 
 Alternative Launch:
 
-1. Recommended: put this repo at `~/.config/nvimconf2` or symlink it there, then launch with `NVIM_APPNAME` only.
+1. Recommended: put this repo at `~/.config/nvimconf-minimal` or symlink it there, then launch with `NVIM_APPNAME` only.
 
 ```sh
-ln -s /Users/james/proj/nvimconf2 ~/.config/nvimconf2
+ln -s ~/proj/nvimconf-minimal ~/.config/nvimconf-minimal
 ```
 2. Run it
 
 ```sh
-NVIM_APPNAME=nvimconf2 nvim /Users/james/proj/vsdf -c "FFFFind"
+NVIM_APPNAME=nvimconf-minimal nvim ~/proj/some-project -c "FFFFind"
 ```

@@ -67,7 +67,7 @@ end
 -- Keep LSP-only keymaps buffer-local and avoid Telescope dependencies entirely.
 local function setup_lsp_keymaps()
   vim.api.nvim_create_autocmd('LspAttach', {
-    group = vim.api.nvim_create_augroup('nvimconf2-lsp-attach', { clear = true }),
+    group = vim.api.nvim_create_augroup('nvimconf-minimal-lsp-attach', { clear = true }),
     callback = function(event)
       local map = function(lhs, rhs, desc)
         vim.keymap.set('n', lhs, rhs, { buffer = event.buf, desc = 'LSP: ' .. desc })
@@ -83,7 +83,7 @@ local function setup_lsp_keymaps()
 
       local client = vim.lsp.get_client_by_id(event.data.client_id)
       if client and client.server_capabilities.documentHighlightProvider then
-        local group = vim.api.nvim_create_augroup('nvimconf2-lsp-highlight-' .. event.buf, { clear = true })
+        local group = vim.api.nvim_create_augroup('nvimconf-minimal-lsp-highlight-' .. event.buf, { clear = true })
 
         vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
           group = group,

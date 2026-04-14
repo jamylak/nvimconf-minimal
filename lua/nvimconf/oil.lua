@@ -162,7 +162,7 @@ function M.setup()
   })
 
   vim.api.nvim_create_autocmd('BufEnter', {
-    group = vim.api.nvim_create_augroup('nvimconf2.oil', { clear = true }),
+    group = vim.api.nvim_create_augroup('nvimconf-minimal.oil', { clear = true }),
     nested = true,
     once = true,
     callback = open_startup_directory,

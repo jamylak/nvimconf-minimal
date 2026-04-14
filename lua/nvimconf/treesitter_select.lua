@@ -320,7 +320,7 @@ function M.select_prev_sibling()
 end
 
 vim.api.nvim_create_autocmd({ 'TextChanged', 'TextChangedI', 'BufLeave' }, {
-  group = vim.api.nvim_create_augroup('nvimconf2.treesitter_select', { clear = true }),
+  group = vim.api.nvim_create_augroup('nvimconf-minimal.treesitter_select', { clear = true }),
   callback = function(args)
     selected_node_by_buf[args.buf] = nil
     missing_parser_notified[args.buf] = nil

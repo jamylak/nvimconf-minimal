@@ -31,7 +31,7 @@ vim.api.nvim_create_user_command(
 )
 
 vim.api.nvim_create_autocmd("VimEnter", {
-  group = vim.api.nvim_create_augroup("nvimconf2.treesitter_install", { clear = true }),
+  group = vim.api.nvim_create_augroup("nvimconf-minimal.treesitter_install", { clear = true }),
   once = true,
   callback = function()
     if #vim.api.nvim_list_uis() == 0 then

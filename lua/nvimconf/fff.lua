@@ -385,7 +385,7 @@ function M.setup()
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
 
-      local group = vim.api.nvim_create_augroup('nvimconf2.fff_history.' .. args.buf, { clear = true })
+      local group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_history.' .. args.buf, { clear = true })
       vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
         group = group,
         buffer = args.buf,

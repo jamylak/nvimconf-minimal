@@ -1,7 +1,7 @@
 local M = {}
 local picker_history = require('nvimconf.picker_history')
 
-local ns = vim.api.nvim_create_namespace('nvimconf2.project_picker')
+local ns = vim.api.nvim_create_namespace('nvimconf-minimal.project_picker')
 
 local state = {
   active = false,
@@ -399,11 +399,11 @@ function M.open(initial_query)
 
   vim.bo[state.prompt_buf].buftype = 'prompt'
   vim.bo[state.prompt_buf].bufhidden = 'wipe'
-  vim.bo[state.prompt_buf].filetype = 'nvimconf2_project_picker'
+  vim.bo[state.prompt_buf].filetype = 'nvimconf-minimal_project_picker'
   vim.fn.prompt_setprompt(state.prompt_buf, state.prompt)
 
   vim.bo[state.list_buf].bufhidden = 'wipe'
-  vim.bo[state.list_buf].filetype = 'nvimconf2_project_picker'
+  vim.bo[state.list_buf].filetype = 'nvimconf-minimal_project_picker'
   vim.bo[state.list_buf].modifiable = false
 
   state.prompt_win = create_window(state.prompt_buf, {
@@ -452,7 +452,7 @@ function M.open(initial_query)
   map({ 'i', 'n' }, '<C-e>', use_selected_name, 'Use selected project name')
   map('i', '<C-w>', '<C-S-w>', 'Delete word')
 
-  local group = vim.api.nvim_create_augroup('nvimconf2.project_picker.' .. state.prompt_buf, { clear = true })
+  local group = vim.api.nvim_create_augroup('nvimconf-minimal.project_picker.' .. state.prompt_buf, { clear = true })
   vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
     group = group,
     buffer = state.prompt_buf,

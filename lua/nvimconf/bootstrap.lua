@@ -61,7 +61,7 @@ local function specs()
 end
 
 if not (vim.pack and type(vim.pack.add) == 'function') then
-  error('nvimconf2 requires Neovim 0.12+ with vim.pack')
+  error('nvimconf-minimal requires Neovim 0.12+ with vim.pack')
 end
 
 local ok_pack, pack_err = pcall(function()
