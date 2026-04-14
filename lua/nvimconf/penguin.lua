@@ -3,6 +3,15 @@ local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
+local function open_penguin()
+  if not M.setup() then
+    return false
+  end
+
+  require('penguin').open()
+  return true
+end
+
 function M.setup()
   if loaded then
     return true
@@ -28,9 +37,13 @@ function M.setup()
     return false
   end
 
-  penguin.setup({})
+  penguin.setup({
+    open_on_bare_enter = true,
+  })
   loaded = true
   return true
 end
+
+M.open = open_penguin
 
 return M
