@@ -304,6 +304,12 @@ local function close_picker()
   end
 end
 
+local function switch_from_picker(open_fn)
+  vim.cmd.stopinsert()
+  close_picker()
+  open_fn()
+end
+
 -- Register user-facing commands, keymaps, and picker-local mappings.
 function M.setup()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
@@ -344,30 +350,40 @@ function M.setup()
     callback = function(args)
       sync_picker_history()
 
-      vim.keymap.set('i', '<m-u>', function()
+      local function buffer_map(lhs, rhs, desc)
+        vim.keymap.set('i', lhs, rhs, {
+          buffer = args.buf,
+          noremap = true,
+          silent = true,
+          nowait = true,
+          desc = desc,
+        })
+      end
+
+      buffer_map('<m-u>', function()
         local picker_ui = require('fff.picker_ui')
         local query = picker_ui.state.query
         local cwd = picker_ui.state.config and picker_ui.state.config.base_path or vim.uv.cwd()
 
         vim.cmd.stopinsert()
         live_grep(query, cwd)
-      end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF live grep' })
+      end, 'FFF live grep')
 
-      vim.keymap.set('i', '<m-n>', function()
-        vim.cmd.stopinsert()
-        close_picker()
-        vim.schedule(function()
+      buffer_map('<m-n>', function()
+        switch_from_picker(function()
           require('nvimconf.project_picker').open()
         end)
-      end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF project picker' })
+      end, 'FFF project picker')
 
-      vim.keymap.set('i', '<m-cr>', function()
-        vim.cmd.stopinsert()
-        close_picker()
-        vim.schedule(function()
+      local function open_penguin_from_fff()
+        switch_from_picker(function()
           require('nvimconf.penguin').open()
         end)
-      end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF command history' })
+      end
+
+      buffer_map('<m-cr>', open_penguin_from_fff, 'FFF command history')
+      buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
+      buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
 
       local group = vim.api.nvim_create_augroup('nvimconf2.fff_history.' .. args.buf, { clear = true })
       vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
