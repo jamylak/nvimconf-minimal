@@ -361,6 +361,14 @@ function M.setup()
         end)
       end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF project picker' })
 
+      vim.keymap.set('i', '<m-cr>', function()
+        vim.cmd.stopinsert()
+        close_picker()
+        vim.schedule(function()
+          require('nvimconf.penguin').open()
+        end)
+      end, { buffer = args.buf, noremap = true, silent = true, desc = 'FFF command history' })
+
       local group = vim.api.nvim_create_augroup('nvimconf2.fff_history.' .. args.buf, { clear = true })
       vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
         group = group,
