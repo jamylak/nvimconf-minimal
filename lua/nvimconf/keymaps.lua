@@ -242,6 +242,7 @@ map("n", ">T", ":tabmove $<CR>", { silent = true, desc = "Move tab far right" })
 map_each("n", { "qk", "<C-e>" }, "$", { silent = true, desc = "End of line" })
 map("v", "<C-e>", "$", { silent = true, desc = "End of line" })
 map_each({ "n", "v" }, { "<C-a>" }, "0", { silent = true, desc = "Start of line" })
+map_each({ "n", "v" }, { "ge" }, "G", { silent = true, desc = "Go to end of file" })
 map("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 map_each("n", { "<C-s>", "<C-f>" }, search_prompt, { silent = true, noremap = true, desc = "Search" })
 
