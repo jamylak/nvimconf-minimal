@@ -245,6 +245,7 @@ map_each({ "n", "v" }, { "<C-a>" }, "0", { silent = true, desc = "Start of line"
 map_each({ "n", "v" }, { "ge" }, "G", { silent = true, desc = "Go to end of file" })
 map("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Clear search highlight" })
 map_each("n", { "<C-s>", "<C-f>" }, search_prompt, { silent = true, noremap = true, desc = "Search" })
+map("n", "<C-b>", "?", { silent = true, noremap = true, desc = "Search backward" })
 
 map("n", "[<Space>", "O<Esc>j", { silent = true, desc = "Line above" })
 map("n", "]<Space>", "o<Esc>k", { silent = true, desc = "Line below" })
