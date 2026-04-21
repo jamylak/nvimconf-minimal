@@ -83,10 +83,9 @@ local function load()
           local dir = oil.get_current_dir()
           oil.close()
 
-          local img_clip = require('img-clip')
-          img_clip.paste_image({}, dir .. filename)
+          require('nvimconf.image_paste').paste_image({}, dir .. filename)
         end,
-        desc = 'Pase using imgclip',
+        desc = 'Paste image to selected path',
         mode = 'n',
       },
       ['gp'] = {

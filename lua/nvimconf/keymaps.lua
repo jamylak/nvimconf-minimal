@@ -123,6 +123,9 @@ map_each("n", { "<leader><leader>q", "<leader>Q", "Q" }, "<cmd>qall!<CR>", {
 	desc = "Quit all",
 })
 map("n", "<leader>w", edit("write_current"), { silent = true, desc = "Write" })
+map("n", "<leader>p", function()
+	require("nvimconf.image_paste").paste_image()
+end, { silent = true, desc = "Paste image from clipboard" })
 
 -- Splits
 map_each("n", { "\\", "<leader>K" }, "<cmd>split<CR>", { silent = true, desc = "Horizontal split" })
