@@ -1,5 +1,7 @@
 local M = {}
 local setup_done = false
+local activation_done = false
+local activation_scheduled = false
 
 local function build_capabilities()
   return vim.tbl_deep_extend('force', vim.lsp.protocol.make_client_capabilities(), {
@@ -252,8 +254,51 @@ local function config_names_for_filetype(filetype)
   return names
 end
 
+local function activate_native_lsp()
+  if activation_done then
+    return
+  end
+
+  vim.lsp.config('*', {
+    capabilities = build_capabilities(),
+  })
+
+  local enabled = {}
+
+  for _, server in ipairs(servers) do
+    vim.lsp.config(server.name, {
+      cmd = server.cmd,
+      filetypes = server.filetypes,
+      root_dir = root_dir(server.cmd, server.root_markers),
+      settings = type(server.settings) == 'function' and server.settings() or server.settings,
+    })
+    enabled[#enabled + 1] = server.name
+  end
+
+  vim.lsp.enable(enabled)
+  activation_done = true
+end
+
+local function schedule_lsp_activation()
+  if activation_scheduled then
+    return
+  end
+
+  activation_scheduled = true
+  vim.api.nvim_create_autocmd('VimEnter', {
+    group = vim.api.nvim_create_augroup('nvimconf-minimal-lsp-enable', { clear = true }),
+    once = true,
+    callback = function()
+      -- Push native LSP activation until after startup work so the editor is responsive first.
+      vim.schedule(activate_native_lsp)
+    end,
+  })
+end
+
 local function setup_commands()
   vim.api.nvim_create_user_command('LspStart', function()
+    activate_native_lsp()
+
     local filetype = vim.bo.filetype
     local names = config_names_for_filetype(filetype)
 
@@ -278,26 +323,9 @@ function M.setup()
   if setup_done then
     return
   end
-
-  vim.lsp.config('*', {
-    capabilities = build_capabilities(),
-  })
-
-  local enabled = {}
-
-  for _, server in ipairs(servers) do
-    vim.lsp.config(server.name, {
-      cmd = server.cmd,
-      filetypes = server.filetypes,
-      root_dir = root_dir(server.cmd, server.root_markers),
-      settings = type(server.settings) == 'function' and server.settings() or server.settings,
-    })
-    enabled[#enabled + 1] = server.name
-  end
-
-  vim.lsp.enable(enabled)
   setup_lsp_keymaps()
   setup_commands()
+  schedule_lsp_activation()
   setup_done = true
 end
 
