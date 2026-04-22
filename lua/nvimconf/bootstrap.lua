@@ -42,6 +42,7 @@ add_local_runtimepath(M.penguin_dir)
 
 local function specs()
   return {
+    { src = gh('nvim-lua/plenary.nvim'), name = 'plenary.nvim' },
     { src = gh('mfussenegger/nvim-dap'), name = 'nvim-dap' },
     { src = gh('nvim-neotest/nvim-nio'), name = 'nvim-nio' },
     { src = gh('rcarriga/nvim-dap-ui'), name = 'nvim-dap-ui' },
@@ -55,6 +56,8 @@ local function specs()
     { src = gh('MagicDuck/grug-far.nvim'), name = 'grug-far.nvim' },
     { src = gh('jamylak/nvim-window'), name = 'nvim-window', version = 'feature/disable-hints' },
     { src = gh('stevearc/oil.nvim'), name = 'oil.nvim' },
+    { src = gh('sindrets/diffview.nvim'), name = 'diffview.nvim' },
+    { src = gh('NeogitOrg/neogit'), name = 'neogit' },
     { src = gh('nvim-treesitter/nvim-treesitter'), name = 'nvim-treesitter' },
     { src = gh('folke/snacks.nvim'), name = 'snacks.nvim' },
   }
