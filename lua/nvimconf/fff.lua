@@ -310,6 +310,55 @@ local function switch_from_picker(open_fn)
   open_fn()
 end
 
+local function is_absolute_path(path)
+  return path:sub(1, 1) == '/' or path:match('^%a:[/\\]') ~= nil or path:sub(1, 2) == '\\\\'
+end
+
+local function create_file_from_picker_query()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if not ok or not picker_ui.state or not picker_ui.state.active then
+    return
+  end
+
+  if picker_ui.state.mode == 'grep' then
+    vim.notify('Create file is only available in the fff file picker', vim.log.levels.WARN)
+    return
+  end
+
+  local query = vim.trim(picker_ui.state.query or '')
+  if query == '' then
+    return
+  end
+
+  local base_path = picker_ui.state.config and picker_ui.state.config.base_path or vim.uv.cwd()
+  local path = query
+  if not is_absolute_path(path) then
+    path = vim.fs.joinpath(base_path, path)
+  end
+  path = vim.fs.normalize(path)
+
+  local parent = vim.fs.dirname(path)
+  if parent and parent ~= '' then
+    local mkdir_ok, mkdir_err = pcall(vim.fn.mkdir, parent, 'p')
+    if not mkdir_ok then
+      vim.notify('Failed to create parent directory: ' .. tostring(mkdir_err), vim.log.levels.ERROR)
+      return
+    end
+  end
+
+  if vim.fn.filereadable(path) == 0 then
+    local write_ok, write_err = pcall(vim.fn.writefile, {}, path, 'b')
+    if not write_ok or write_err ~= 0 then
+      vim.notify('Failed to create file: ' .. path, vim.log.levels.ERROR)
+      return
+    end
+  end
+
+  vim.cmd.stopinsert()
+  close_picker()
+  vim.cmd.edit(vim.fn.fnameescape(path))
+end
+
 -- Register user-facing commands, keymaps, and picker-local mappings.
 function M.setup()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
@@ -384,6 +433,7 @@ function M.setup()
       buffer_map('<m-cr>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
+      buffer_map('<S-CR>', create_file_from_picker_query, 'FFF create file from query')
 
       local group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_history.' .. args.buf, { clear = true })
       vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChanged' }, {
