@@ -18,6 +18,7 @@ require("nvimconf.lsp").setup()
 require("nvimconf.blink").setup()
 require("nvimconf.cplug").setup()
 require("nvimconf.penguin").setup()
+require("nvimconf.markdown_images").setup()
 
 vim.api.nvim_create_user_command(
   "TSInstallFavorites",
