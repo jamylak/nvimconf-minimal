@@ -90,18 +90,15 @@ local function diff_main(opts)
   require('neogit.integrations.diffview').open('range', base .. '..HEAD')
 end
 
-local function log_current(opts)
+local function log_current()
   local neogit = ensure_loaded()
   if not neogit then
     return
   end
 
-  local args = {}
-  if opts.args ~= '' then
-    table.insert(args, '--max-count=' .. opts.args)
-  end
-
-  neogit.action('log', 'log_current', args)()
+  local commits = require('neogit.lib.git').log.list({}, nil, nil, false, false)
+  require('neogit.buffers.log_view').new(commits, {}):open()
+  require('neogit.integrations.diffview').open('range', 'HEAD^..HEAD')
 end
 
 function M.setup()
@@ -126,8 +123,8 @@ function M.setup()
   })
 
   vim.api.nvim_create_user_command('NeogitLog', log_current, {
-    nargs = '?',
-    desc = 'Open current-branch log, optionally limited by max count',
+    nargs = 0,
+    desc = 'Open the log and last commit diff',
   })
 end
 
