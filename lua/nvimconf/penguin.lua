@@ -3,12 +3,21 @@ local bootstrap = require('nvimconf.bootstrap')
 
 local loaded = false
 
+local function ensure_prompt_insert()
+  vim.schedule(function()
+    if vim.bo.filetype == 'penguin-prompt' then
+      vim.cmd.startinsert()
+    end
+  end)
+end
+
 local function open_penguin()
   if not M.setup() then
     return false
   end
 
   require('penguin').open()
+  ensure_prompt_insert()
   return true
 end
 
