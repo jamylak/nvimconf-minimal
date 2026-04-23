@@ -431,6 +431,7 @@ function M.setup()
       end
 
       buffer_map('<m-cr>', open_penguin_from_fff, 'FFF command history')
+      buffer_map('<m-space>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
       buffer_map('<S-CR>', create_file_from_picker_query, 'FFF create file from query')
