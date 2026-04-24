@@ -33,6 +33,10 @@ local function open_project_picker()
 	require("nvimconf.project_picker").open()
 end
 
+local function open_oldfiles_picker()
+	require("nvimconf.oldfiles_picker").open()
+end
+
 local function reopen_last_picker()
 	require("nvimconf.picker_history").reopen()
 end
@@ -188,6 +192,7 @@ map("n", "<a-j>", resize_split("j"), { silent = true, desc = "Resize split down"
 map("n", "<a-k>", resize_split("k"), { silent = true, desc = "Resize split up" })
 map("n", "<a-l>", resize_split("l"), { silent = true, desc = "Resize split right" })
 map("n", "<m-n>", open_project_picker, { silent = true, desc = "Switch project" })
+map("n", "<m-o>", open_oldfiles_picker, { silent = true, desc = "Oldfiles" })
 map("n", "<m-cr>", open_penguin, { silent = true, desc = "Command history" })
 map("n", "<leader>bd", "<cmd>bd!<CR>", { silent = true, desc = "Delete buffer" })
 map_each("n", { "sb", "sj" }, "<cmd>b#<CR>", { silent = true, desc = "Swap buffer" })
@@ -297,6 +302,10 @@ map("i", "<m-n>", function()
 	vim.cmd.stopinsert()
 	open_project_picker()
 end, { silent = true, desc = "Switch project" })
+map("i", "<m-o>", function()
+	vim.cmd.stopinsert()
+	open_oldfiles_picker()
+end, { silent = true, desc = "Oldfiles" })
 map("i", "<m-cr>", function()
 	vim.cmd.stopinsert()
 	reopen_last_picker()
@@ -308,6 +317,10 @@ map("t", "<m-n>", function()
 	vim.cmd.stopinsert()
 	open_project_picker()
 end, { silent = true, desc = "Switch project" })
+map("t", "<m-o>", function()
+	vim.cmd.stopinsert()
+	open_oldfiles_picker()
+end, { silent = true, desc = "Oldfiles" })
 map("t", "<m-cr>", function()
 	vim.cmd.stopinsert()
 	reopen_last_picker()
@@ -344,6 +357,14 @@ end, { desc = "Write and quit" })
 vim.api.nvim_create_user_command("Q", function()
 	vim.cmd("qall!")
 end, { desc = "Quit all" })
+
+vim.api.nvim_create_user_command("Oldfiles", function(opts)
+	require("nvimconf.oldfiles_picker").open(opts.args ~= "" and opts.args or nil)
+end, {
+	force = false,
+	nargs = "?",
+	desc = "Open oldfiles picker",
+})
 
 vim.api.nvim_create_user_command('LeftMargin', function()
   vim.cmd('vnew')

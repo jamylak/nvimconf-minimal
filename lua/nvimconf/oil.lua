@@ -56,10 +56,10 @@ local function load()
     },
     keymaps = {
       ['<m-o>'] = function()
-        vim.cmd 'Telescope oldfiles'
+        require('nvimconf.oldfiles_picker').open()
       end,
       ['<m-i>'] = function()
-        vim.cmd 'Telescope find_files'
+        require('nvimconf.fff').find_files()
       end,
       ['cd'] = {
         callback = tab_change_directory,
