@@ -32,9 +32,6 @@ function M.setup()
   end
 
   cplug.setup({
-    dap = {
-      auto_adapter = 'lldb',
-    },
   })
   loaded = true
   return true
