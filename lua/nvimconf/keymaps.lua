@@ -109,6 +109,10 @@ local external = function(method)
 	return call("nvimconf.actions.external", method)
 end
 
+local explorer = function(method)
+	return call("nvimconf.actions.explorer", method)
+end
+
 local terminal = function(method)
 	return call("nvimconf.actions.terminal", method)
 end
@@ -130,6 +134,7 @@ map("n", "<leader>w", edit("write_current"), { silent = true, desc = "Write" })
 map("n", "<leader>p", function()
 	require("nvimconf.image_paste").paste_image()
 end, { silent = true, desc = "Paste image from clipboard" })
+map("n", "<leader>i", explorer("toggle"), { silent = true, desc = "Open file explorer" })
 
 -- Splits
 map_each("n", { "\\", "<leader>K" }, "<cmd>split<CR>", { silent = true, desc = "Horizontal split" })
