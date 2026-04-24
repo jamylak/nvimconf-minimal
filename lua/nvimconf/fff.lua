@@ -310,6 +310,12 @@ local function switch_from_picker(open_fn)
   open_fn()
 end
 
+local function feed_key_from_picker(key)
+  vim.cmd.stopinsert()
+  close_picker()
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(key, true, false, true), 'm', false)
+end
+
 local function is_absolute_path(path)
   return path:sub(1, 1) == '/' or path:match('^%a:[/\\]') ~= nil or path:sub(1, 2) == '\\\\'
 end
@@ -434,6 +440,9 @@ function M.setup()
       buffer_map('<m-space>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
+      buffer_map('<c-g>', function()
+        feed_key_from_picker('<c-g>')
+      end, 'Close FFF and open lazygit')
       buffer_map('<S-CR>', create_file_from_picker_query, 'FFF create file from query')
 
       local group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_history.' .. args.buf, { clear = true })
