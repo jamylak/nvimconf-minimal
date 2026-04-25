@@ -356,6 +356,7 @@ map("x", "H", treesitter_select("select_parent_visual"), { silent = true, desc =
 map("x", "L", treesitter_select("select_child_visual"), { silent = true, desc = "Treesitter select child" })
 
 -- User commands
+vim.api.nvim_create_user_command("ProjectPicker", open_project_picker, { desc = "Project Picker" })
 vim.api.nvim_create_user_command("WQ", function()
 	vim.cmd("wq!")
 end, { desc = "Write and quit" })
