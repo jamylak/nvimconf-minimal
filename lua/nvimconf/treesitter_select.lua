@@ -29,8 +29,11 @@ local function selected_node(bufnr)
   return selected_node_by_buf[bufnr]
 end
 
-local function parser_available(bufnr)
-  return pcall(vim.treesitter.get_parser, bufnr)
+local function get_parser(bufnr)
+  local ok, parser = pcall(vim.treesitter.get_parser, bufnr)
+  if ok then
+    return parser
+  end
 end
 
 local function notify_missing_parser(bufnr)
@@ -47,12 +50,15 @@ local function notify_missing_parser(bufnr)
 end
 
 local function maybe_start(bufnr)
-  if not parser_available(bufnr) then
+  local parser = get_parser(bufnr)
+  if not parser then
     notify_missing_parser(bufnr)
     return false
   end
 
-  local ok = pcall(vim.treesitter.start, bufnr)
+  local ok = pcall(function()
+    parser:parse()
+  end)
   if not ok then
     notify_missing_parser(bufnr)
     return false

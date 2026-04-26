@@ -275,7 +275,7 @@ map("n", "qm", "v$", { silent = true, desc = "Visual to EOL" })
 map("n", "<C-;>", "g;", { silent = true, desc = "Previous change" })
 map("n", "<C-,>", "g,", { silent = true, desc = "Next change" })
 map("n", "qn", treesitter_select("select_current_node"), { silent = true, desc = "Treesitter select current node" })
-map("n", "vn", treesitter_select("select_current_node"), { silent = true, desc = "Treesitter select current node" })
+map("n", "vn", treesitter_select("select_current_node"), { silent = true, nowait = true, desc = "Treesitter select current node" })
 map("n", "qh", treesitter_select("select_parent_node"), { silent = true, desc = "Treesitter select parent node" })
 map("n", "vx", treesitter_select("select_parent_node"), { silent = true, desc = "Treesitter select parent node" })
 
