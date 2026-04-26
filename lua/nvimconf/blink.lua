@@ -17,10 +17,10 @@ local function setup_blink()
     keymap = {
       preset = 'none',
       ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
-      ['<C-e>'] = { 'hide' },
+      ['<C-e>'] = { 'hide', 'fallback' },
       ['<C-n>'] = { 'select_next', 'fallback' },
       ['<C-p>'] = { 'select_prev', 'fallback' },
-      ['<C-y>'] = { 'select_and_accept' },
+      ['<C-y>'] = { 'select_and_accept', 'fallback' },
       ['<C-j>'] = { 'select_and_accept', 'fallback' },
     },
     fuzzy = {
