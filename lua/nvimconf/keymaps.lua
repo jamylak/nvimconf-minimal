@@ -173,6 +173,7 @@ map("n", "<leader><leader>s", "<cmd>source %<CR>", { noremap = true, desc = "Sou
 map("n", "<A-y>", external("yazi_here"), { noremap = true, silent = true, desc = "Open yazi" })
 map("n", "<C-y>", external("yazi_new_tab"), { noremap = true, silent = true, desc = "Open yazi in new tab" })
 map("n", "<C-g>", lazygit("open"), { noremap = true, silent = true, desc = "Open lazygit" })
+map("n", "<m-b>", lazygit("log_file"), { noremap = true, silent = true, desc = "Lazygit file log" })
 
 -- Windows and buffers
 map("n", "gj", pick_window, { silent = true, desc = "Jump to window" })
