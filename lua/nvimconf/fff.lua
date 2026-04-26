@@ -144,22 +144,27 @@ end
 
 -- Reopen fff actions through one guarded entrypoint so install/startinsert behavior stays consistent.
 local function reopen(fn)
-  vim.schedule(function()
-    if not ensure_binary() then
-      return
-    end
-
-    local ok, picker_ui = pcall(require, 'fff.picker_ui')
-    if ok and picker_ui.state and picker_ui.state.active then
-      picker_ui.close()
-    end
-
-    fn()
+  if vim.in_fast_event() then
     vim.schedule(function()
-      if vim.bo.filetype == 'fff_input' then
-        vim.cmd.startinsert()
-      end
+      reopen(fn)
     end)
+    return
+  end
+
+  if not ensure_binary() then
+    return
+  end
+
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if ok and picker_ui.state and picker_ui.state.active then
+    picker_ui.close()
+  end
+
+  fn()
+  vim.schedule(function()
+    if vim.bo.filetype == 'fff_input' then
+      vim.cmd.startinsert()
+    end
   end)
 end
 
