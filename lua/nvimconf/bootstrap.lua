@@ -51,6 +51,7 @@ local function specs()
     -- { src = gh('jamylak/cplug.nvim'), name = 'cplug.nvim' },
     -- Uncomment this and remove the local runtimepath line above to use GitHub instead.
     -- { src = gh('jamylak/penguin.nvim'), name = 'penguin.nvim' },
+    { src = gh('nvim-tree/nvim-web-devicons'), name = 'nvim-web-devicons' },
     { src = gh('dmtrKovalenko/fff.nvim'), name = 'fff.nvim' },
     { src = gh('Saghen/blink.cmp'), name = 'blink.cmp', version = vim.version.range('1') },
     { src = gh('MagicDuck/grug-far.nvim'), name = 'grug-far.nvim' },
