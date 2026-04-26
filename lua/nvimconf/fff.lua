@@ -192,6 +192,21 @@ local function remember_live_grep(query, cwd)
   end)
 end
 
+local function picker_input_query(state)
+  if not state or not state.input_buf or not vim.api.nvim_buf_is_valid(state.input_buf) then
+    return normalize_query(state and state.query or nil)
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(state.input_buf, 0, -1, false)
+  local query = table.concat(lines, '')
+  local prompt = state.config and state.config.prompt or ''
+  if prompt ~= '' and vim.startswith(query, prompt) then
+    query = query:sub(#prompt + 1)
+  end
+
+  return normalize_query(query)
+end
+
 open_file_picker = function(opts)
   opts = opts or {}
 
@@ -288,7 +303,7 @@ local function sync_picker_history()
 
   local state = picker_ui.state
   local cwd = state.config and state.config.base_path or vim.uv.cwd()
-  local query = normalize_query(state.query)
+  local query = picker_input_query(state)
 
   if state.mode == 'grep' then
     remember_live_grep(query, cwd)
@@ -422,7 +437,7 @@ function M.setup()
 
       buffer_map('<m-u>', function()
         local picker_ui = require('fff.picker_ui')
-        local query = picker_ui.state.query
+        local query = picker_input_query(picker_ui.state)
         local cwd = picker_ui.state.config and picker_ui.state.config.base_path or vim.uv.cwd()
 
         vim.cmd.stopinsert()
@@ -441,7 +456,10 @@ function M.setup()
         end)
       end
 
-      buffer_map('<m-cr>', open_penguin_from_fff, 'FFF command history')
+      buffer_map('<m-cr>', function()
+        sync_picker_history()
+        require('nvimconf.picker_history').reopen()
+      end, 'Reopen last picker')
       buffer_map('<m-space>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
