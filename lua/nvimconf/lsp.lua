@@ -209,13 +209,18 @@ local servers = {
   },
 }
 
-local function prompt_workspace_symbols()
-  local query = vim.fn.input('Workspace symbols: ', vim.fn.expand('<cword>'))
-  if query == nil or query == '' then
-    return
-  end
+local function lsp_picker(method, opts)
+  return function()
+    local snacks = require('nvimconf.snacks').ensure({
+      picker = {},
+    })
+    if not snacks or not snacks.picker or type(snacks.picker[method]) ~= 'function' then
+      vim.notify('Snacks picker is unavailable for LSP ' .. method, vim.log.levels.ERROR)
+      return
+    end
 
-  vim.lsp.buf.workspace_symbol(query)
+    snacks.picker[method](opts or {})
+  end
 end
 
 local function setup_lsp_keymaps()
@@ -226,14 +231,15 @@ local function setup_lsp_keymaps()
         vim.keymap.set('n', lhs, rhs, { buffer = event.buf, desc = 'LSP: ' .. desc })
       end
 
-      map('gd', vim.lsp.buf.definition, 'Goto definition')
-      map('gr', vim.lsp.buf.references, 'Goto references')
-      map('gI', vim.lsp.buf.implementation, 'Goto implementation')
-      map('gD', vim.lsp.buf.declaration, 'Goto declaration')
-      map('<leader>D', vim.lsp.buf.type_definition, 'Type definition')
-      map('<leader>d', vim.lsp.buf.document_symbol, 'Document symbols')
-      map('<leader>ss', prompt_workspace_symbols, 'Workspace symbols')
-      map('<leader>sd', prompt_workspace_symbols, 'Workspace symbols')
+      map('gd', lsp_picker('lsp_definitions'), 'Goto definition')
+      map('gr', lsp_picker('lsp_references'), 'Goto references')
+      map('gI', lsp_picker('lsp_implementations'), 'Goto implementation')
+      map('gD', lsp_picker('lsp_declarations'), 'Goto declaration')
+      map('<leader>D', lsp_picker('lsp_type_definitions'), 'Type definition')
+      map('<leader>d', lsp_picker('lsp_symbols'), 'Document symbols')
+      map('<leader>ss', lsp_picker('lsp_workspace_symbols'), 'Workspace symbols')
+      map('<leader>sd', lsp_picker('diagnostics_buffer'), 'Buffer diagnostics')
+      map('<leader>sD', lsp_picker('diagnostics'), 'Workspace diagnostics')
       map('K', vim.lsp.buf.hover, 'Hover')
       map('<leader>rn', vim.lsp.buf.rename, 'Rename')
       map('<leader>lr', vim.lsp.buf.rename, 'Rename')
