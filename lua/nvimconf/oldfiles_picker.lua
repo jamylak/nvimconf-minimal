@@ -221,6 +221,12 @@ local function close()
 	end
 end
 
+local function reopen_last_picker()
+	state.query = read_query()
+	remember_open(state.query)
+	require("nvimconf.picker_history").reopen()
+end
+
 local function move_selection(delta)
 	if #state.filtered == 0 then
 		return
@@ -372,6 +378,7 @@ function M.open(initial_query)
 	map({ "i", "n" }, "<C-t>", function()
 		open_file("tabedit")
 	end, "Open oldfile in tab")
+	map({ "i", "n" }, "<m-cr>", reopen_last_picker, "Reopen last picker")
 	map("i", "<C-w>", "<C-S-w>", "Delete word")
 
 	local group = vim.api.nvim_create_augroup("nvimconf-minimal.oldfiles_picker." .. state.prompt_buf, { clear = true })

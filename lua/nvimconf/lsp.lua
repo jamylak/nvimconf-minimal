@@ -1,4 +1,6 @@
 local M = {}
+local picker_history = require('nvimconf.picker_history')
+
 local setup_done = false
 local activation_done = false
 local activation_scheduled = false
@@ -211,6 +213,8 @@ local servers = {
 
 local function lsp_picker(method, opts)
   return function()
+    picker_history.set(lsp_picker(method, opts and vim.deepcopy(opts) or nil))
+
     local snacks = require('nvimconf.snacks').ensure({
       picker = {},
     })

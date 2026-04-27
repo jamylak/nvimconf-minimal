@@ -276,6 +276,12 @@ local function close()
   end
 end
 
+local function reopen_last_picker()
+  state.query = read_query()
+  remember_open(state.query)
+  require('nvimconf.picker_history').reopen()
+end
+
 local function move_selection(delta)
   if #state.filtered == 0 then
     return
@@ -449,6 +455,7 @@ function M.open(initial_query)
   map({ 'i', 'n' }, '<CR>', function() select_current(false) end, 'Open project')
   map({ 'i', 'n' }, '<C-j>', function() select_current(true) end, 'Reuse existing project tab')
   map({ 'i', 'n' }, '<S-CR>', create_project, 'Create project')
+  map({ 'i', 'n' }, '<m-cr>', reopen_last_picker, 'Reopen last picker')
   map({ 'i', 'n' }, '<C-e>', use_selected_name, 'Use selected project name')
   map('i', '<C-w>', '<C-S-w>', 'Delete word')
 

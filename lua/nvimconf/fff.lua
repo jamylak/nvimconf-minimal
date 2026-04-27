@@ -10,6 +10,20 @@ local function normalize_query(query)
   return query
 end
 
+local function same_directory(left, right)
+  if not left or left == '' or not right or right == '' then
+    return false
+  end
+
+  local left_real = vim.uv.fs_realpath(vim.fn.expand(left))
+  local right_real = vim.uv.fs_realpath(vim.fn.expand(right))
+  if left_real and right_real then
+    return left_real == right_real
+  end
+
+  return vim.fs.normalize(vim.fn.expand(left)) == vim.fs.normalize(vim.fn.expand(right))
+end
+
 local open_file_picker
 local live_grep
 
@@ -192,6 +206,21 @@ local function remember_live_grep(query, cwd)
   end)
 end
 
+local function picker_input_query(state)
+  if not state or not state.input_buf or not vim.api.nvim_buf_is_valid(state.input_buf) then
+    return normalize_query(state and state.query or nil)
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(state.input_buf, 0, -1, false)
+  local query = table.concat(lines, '')
+  local prompt = state.config and state.config.prompt or ''
+  if prompt ~= '' and vim.startswith(query, prompt) then
+    query = query:sub(#prompt + 1)
+  end
+
+  return normalize_query(query)
+end
+
 open_file_picker = function(opts)
   opts = opts or {}
 
@@ -210,9 +239,12 @@ open_file_picker = function(opts)
     local picker_opts = {}
 
     if cwd and cwd ~= '' then
-      local ok = fff.change_indexing_directory(cwd)
-      if ok == false then
-        return
+      local config = require('fff.conf').get()
+      if not same_directory(cwd, config.base_path) then
+        local ok = fff.change_indexing_directory(cwd)
+        if ok == false then
+          return
+        end
       end
       picker_opts.cwd = cwd
     end
@@ -288,7 +320,7 @@ local function sync_picker_history()
 
   local state = picker_ui.state
   local cwd = state.config and state.config.base_path or vim.uv.cwd()
-  local query = normalize_query(state.query)
+  local query = picker_input_query(state)
 
   if state.mode == 'grep' then
     remember_live_grep(query, cwd)
@@ -422,7 +454,7 @@ function M.setup()
 
       buffer_map('<m-u>', function()
         local picker_ui = require('fff.picker_ui')
-        local query = picker_ui.state.query
+        local query = picker_input_query(picker_ui.state)
         local cwd = picker_ui.state.config and picker_ui.state.config.base_path or vim.uv.cwd()
 
         vim.cmd.stopinsert()
@@ -441,7 +473,10 @@ function M.setup()
         end)
       end
 
-      buffer_map('<m-cr>', open_penguin_from_fff, 'FFF command history')
+      buffer_map('<m-cr>', function()
+        sync_picker_history()
+        require('nvimconf.picker_history').reopen()
+      end, 'Reopen last picker')
       buffer_map('<m-space>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
       buffer_map('<esc><c-m>', open_penguin_from_fff, 'FFF command history (Esc Ctrl-M fallback)')
