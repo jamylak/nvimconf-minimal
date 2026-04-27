@@ -10,6 +10,20 @@ local function normalize_query(query)
   return query
 end
 
+local function same_directory(left, right)
+  if not left or left == '' or not right or right == '' then
+    return false
+  end
+
+  local left_real = vim.uv.fs_realpath(vim.fn.expand(left))
+  local right_real = vim.uv.fs_realpath(vim.fn.expand(right))
+  if left_real and right_real then
+    return left_real == right_real
+  end
+
+  return vim.fs.normalize(vim.fn.expand(left)) == vim.fs.normalize(vim.fn.expand(right))
+end
+
 local open_file_picker
 local live_grep
 
@@ -225,9 +239,12 @@ open_file_picker = function(opts)
     local picker_opts = {}
 
     if cwd and cwd ~= '' then
-      local ok = fff.change_indexing_directory(cwd)
-      if ok == false then
-        return
+      local config = require('fff.conf').get()
+      if not same_directory(cwd, config.base_path) then
+        local ok = fff.change_indexing_directory(cwd)
+        if ok == false then
+          return
+        end
       end
       picker_opts.cwd = cwd
     end
