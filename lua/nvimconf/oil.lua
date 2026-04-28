@@ -151,6 +151,36 @@ local function open_from_command(opts)
   }, {})
 end
 
+function M.open_at_file(path)
+  if type(path) ~= 'string' or path == '' then
+    return
+  end
+  if not load() then
+    return
+  end
+
+  if vim.startswith(path, '\\\\?\\') then
+    path = path:sub(5)
+  end
+
+  local stat = vim.uv.fs_stat(path)
+  local dir = stat and stat.type == 'directory' and path or vim.fn.fnamemodify(path, ':p:h')
+  local name = stat and stat.type == 'directory' and nil or vim.fn.fnamemodify(path, ':t')
+
+  local oil = require('oil')
+  if name and name ~= '' then
+    local parent_url = oil.get_url_for_path(dir)
+    if parent_url then
+      local ok_view, view = pcall(require, 'oil.view')
+      if ok_view then
+        pcall(view.set_last_cursor, parent_url, name)
+      end
+    end
+  end
+
+  oil.open(dir)
+end
+
 function M.setup()
   set_global_keymaps()
 

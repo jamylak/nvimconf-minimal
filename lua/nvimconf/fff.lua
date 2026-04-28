@@ -402,6 +402,23 @@ local function create_file_from_picker_query()
   vim.cmd.edit(vim.fn.fnameescape(path))
 end
 
+local function open_oil_from_picker()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if not ok or not picker_ui.state or not picker_ui.state.active then
+    return
+  end
+
+  local item = picker_ui.state.filtered_items[picker_ui.state.cursor]
+  if not item or not item.path then
+    return
+  end
+
+  local path = item.path
+  switch_from_picker(function()
+    require('nvimconf.oil').open_at_file(path)
+  end)
+end
+
 -- Register user-facing commands, keymaps, and picker-local mappings.
 function M.setup()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
@@ -483,6 +500,7 @@ function M.setup()
       buffer_map('<c-g>', function()
         feed_key_from_picker('<c-g>')
       end, 'Close FFF and open lazygit')
+      buffer_map('<c-o>', open_oil_from_picker, 'Open Oil at selected file')
       buffer_map('<S-CR>', create_file_from_picker_query, 'FFF create file from query')
 
       local group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_history.' .. args.buf, { clear = true })
