@@ -277,7 +277,7 @@ map("n", "qh", treesitter_select("select_parent_node"), { silent = true, desc = 
 map("n", "vx", treesitter_select("select_parent_node"), { silent = true, desc = "Treesitter select parent node" })
 
 -- Insert mode
-map_each("i", { "ji", "jk" }, "<Esc>", { silent = true, desc = "Escape insert mode" })
+map_each("i", { "ji", "jk", "<C-Return>" }, "<Esc>", { silent = true, desc = "Escape insert mode" })
 
 map("i", "<C-k>", edit("check_and_delete"), { expr = true, noremap = true, desc = "Delete right or join line" })
 map("i", "<C-y>", "<C-r>+", { silent = true, desc = "Paste clipboard" })
