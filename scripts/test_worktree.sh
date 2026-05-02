@@ -5,9 +5,10 @@ set -eu
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 REPO_DIR=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 APP_NAME=$(basename "$REPO_DIR")
-CONFIG_LINK="$HOME/.config/$APP_NAME"
+CONFIG_HOME=${XDG_CONFIG_HOME:-"$HOME/.config"}
+CONFIG_LINK="$CONFIG_HOME/$APP_NAME"
 
-mkdir -p "$HOME/.config"
+mkdir -p "$CONFIG_HOME"
 
 if [ -L "$CONFIG_LINK" ]; then
   CURRENT_TARGET=$(readlink "$CONFIG_LINK" || true)
