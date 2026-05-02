@@ -43,4 +43,6 @@ function M.setup()
   })
 end
 
+M.attach_buffer = attach
+
 return M

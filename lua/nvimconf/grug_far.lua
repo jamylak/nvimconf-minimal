@@ -34,19 +34,7 @@ local function open(opts)
   require('grug-far').open(opts or {})
 end
 
-function M.setup()
-  vim.keymap.set({ 'n', 'x' }, '<leader>S', function()
-    open()
-  end, { desc = 'Grug search' })
-
-  vim.keymap.set('n', 'S', function()
-    open()
-  end, { desc = 'Grug search' })
-
-  vim.keymap.set({ 'n', 'x', 'v' }, '<leader><leader>S', function()
-    open({ visualSelectionUsage = 'operate-within-range' })
-  end, { desc = 'Grug search within range' })
-end
+M.open = open
 
 function M.ensure_loaded_for_test()
   return ensure_loaded()

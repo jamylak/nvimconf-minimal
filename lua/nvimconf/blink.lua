@@ -70,4 +70,6 @@ function M.setup()
   })
 end
 
+M.load = setup_blink
+
 return M

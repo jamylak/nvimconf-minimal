@@ -181,21 +181,8 @@ function M.open_at_file(path)
   oil.open(dir)
 end
 
-function M.setup()
-  set_global_keymaps()
-
-  vim.api.nvim_create_user_command('Oil', open_from_command, {
-    nargs = '*',
-    complete = 'dir',
-    desc = 'Open Oil file browser',
-  })
-
-  vim.api.nvim_create_autocmd('BufEnter', {
-    group = vim.api.nvim_create_augroup('nvimconf-minimal.oil', { clear = true }),
-    nested = true,
-    once = true,
-    callback = open_startup_directory,
-  })
-end
+M.set_global_keymaps = set_global_keymaps
+M.open_from_command = open_from_command
+M.open_startup_directory = open_startup_directory
 
 return M

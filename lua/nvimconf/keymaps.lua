@@ -1,4 +1,5 @@
 local map = vim.keymap.set
+local bootstrap = require("nvimconf.bootstrap")
 
 local function call(module_name, method)
 	return function(...)
@@ -131,6 +132,13 @@ map("n", "<leader>p", function()
 	require("nvimconf.image_paste").paste_image()
 end, { silent = true, desc = "Paste image from clipboard" })
 map("n", "<leader>i", explorer("toggle"), { silent = true, desc = "Open file explorer" })
+map("n", "<leader>od", "<CMD>Oil " .. os.getenv("HOME") .. "/.config/dotfiles<CR>", { desc = "[O]pen [D]otfiles" })
+map("n", "<leader>ot", "<CMD>Oil /tmp<CR>", { desc = "[O]pen /[T]mp" })
+map("n", "<leader>oc", "<CMD>Oil " .. vim.fn.stdpath("config") .. "<CR>", { desc = "[O]pen [N]eovim Config" })
+map("n", "<leader>on", "<CMD>Oil " .. bootstrap.plugins_dir .. "<CR>", { desc = "[O]pen [N]eovim Plugins Folder" })
+map("n", "<leader>op", "<CMD>Oil " .. os.getenv("HOME") .. "/proj<CR>", { desc = "[O]pen Projects" })
+map("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+map("n", "<c-x><c-j>", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 
 -- Splits
 map_each("n", { "\\", "<leader>K" }, "<cmd>split<CR>", { silent = true, desc = "Horizontal split" })
@@ -170,6 +178,15 @@ map("n", "<A-y>", external("yazi_here"), { noremap = true, silent = true, desc =
 map("n", "<C-y>", external("yazi_new_tab"), { noremap = true, silent = true, desc = "Open yazi in new tab" })
 map("n", "<C-g>", lazygit("open"), { noremap = true, silent = true, desc = "Open lazygit" })
 map("n", "<m-b>", lazygit("log_file"), { noremap = true, silent = true, desc = "Lazygit file log" })
+map({ "n", "x" }, "<leader>S", function()
+	require("nvimconf.grug_far").open()
+end, { desc = "Grug search" })
+map("n", "S", function()
+	require("nvimconf.grug_far").open()
+end, { desc = "Grug search" })
+map({ "n", "x", "v" }, "<leader><leader>S", function()
+	require("nvimconf.grug_far").open({ visualSelectionUsage = "operate-within-range" })
+end, { desc = "Grug search within range" })
 
 -- Windows and buffers
 map("n", "gj", pick_window, { silent = true, desc = "Jump to window" })

@@ -295,6 +295,11 @@ local function schedule_lsp_activation()
   end
 
   activation_scheduled = true
+  if vim.v.vim_did_enter == 1 then
+    vim.schedule(activate_native_lsp)
+    return
+  end
+
   vim.api.nvim_create_autocmd('VimEnter', {
     group = vim.api.nvim_create_augroup('nvimconf-minimal-lsp-enable', { clear = true }),
     once = true,

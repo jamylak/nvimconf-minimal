@@ -97,31 +97,9 @@ local function log_current()
   diffview.open({ 'HEAD^..HEAD' })
 end
 
-function M.setup()
-  vim.api.nvim_create_user_command('Neogit', open_from_command, {
-    nargs = '*',
-    bang = true,
-    complete = 'file',
-    desc = 'Open Neogit',
-  })
-
-  vim.api.nvim_create_user_command('NeogitDiff', diff_worktree, {
-    nargs = 0,
-    desc = 'Open worktree diff in Neogit/Diffview',
-  })
-
-  vim.api.nvim_create_user_command('NeogitDiffMain', diff_main, {
-    nargs = '?',
-    complete = function()
-      return { 'main', 'master', 'origin/main', 'origin/master' }
-    end,
-    desc = 'Open diff from main branch to HEAD',
-  })
-
-  vim.api.nvim_create_user_command('NeogitLog', log_current, {
-    nargs = 0,
-    desc = 'Open the log and last commit diff',
-  })
-end
+M.open_from_command = open_from_command
+M.diff_worktree = diff_worktree
+M.diff_main = diff_main
+M.log_current = log_current
 
 return M
