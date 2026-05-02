@@ -40,6 +40,21 @@ local function require_fff(module_name)
   return module
 end
 
+local function fff_binary_extension()
+  local sysname = vim.uv.os_uname().sysname:lower()
+  if sysname:match('windows') then
+    return 'dll'
+  end
+  if sysname:match('darwin') then
+    return 'dylib'
+  end
+  return 'so'
+end
+
+local function installed_binary_path()
+  return vim.fs.joinpath(bootstrap.plugins_dir, 'fff.nvim', 'target', 'release', 'libfff_nvim.' .. fff_binary_extension())
+end
+
 -- Clear cached fff modules so a failed pre-install load can be retried cleanly.
 local function reset_modules()
   package.loaded['fff'] = nil
@@ -138,14 +153,17 @@ end
 
 -- Ensure the native backend exists before any fff UI code tries to require it.
 local function ensure_binary()
-  local download = require_fff('fff.download')
-  if not download then
-    return false
-  end
-  local binary_path = download.get_binary_path()
+  bootstrap.load_plugin('fff.nvim')
+
+  local binary_path = installed_binary_path()
   local stat = vim.uv.fs_stat(binary_path)
   if stat and stat.type == 'file' then
     return true
+  end
+
+  local download = require_fff('fff.download')
+  if not download then
+    return false
   end
 
   vim.notify('Installing fff.nvim native backend...', vim.log.levels.INFO)
