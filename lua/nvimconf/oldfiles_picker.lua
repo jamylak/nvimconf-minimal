@@ -1,5 +1,6 @@
 local M = {}
 local picker_history = require("nvimconf.picker_history")
+local picker_switch = require("nvimconf.picker_switch")
 
 local ns = vim.api.nvim_create_namespace("nvimconf-minimal.oldfiles_picker")
 
@@ -221,6 +222,12 @@ local function close()
 	end
 end
 
+local function switch_from_picker(open_fn)
+	state.query = read_query()
+	remember_open(state.query)
+	picker_switch.open(open_fn)
+end
+
 local function reopen_last_picker()
 	state.query = read_query()
 	remember_open(state.query)
@@ -378,6 +385,24 @@ function M.open(initial_query)
 	map({ "i", "n" }, "<C-t>", function()
 		open_file("tabedit")
 	end, "Open oldfile in tab")
+	map({ "i", "n" }, "<m-n>", function()
+		switch_from_picker(function()
+			require("nvimconf.project_picker").open()
+		end)
+	end, "Switch project")
+	map({ "i", "n" }, "<m-o>", function()
+		vim.cmd.startinsert()
+	end, "Oldfiles")
+	map({ "i", "n" }, "<m-space>", function()
+		switch_from_picker(function()
+			require("nvimconf.penguin").open()
+		end)
+	end, "Command history")
+	map({ "i", "n" }, "<C-Return>", function()
+		switch_from_picker(function()
+			require("nvimconf.fff").find_files()
+		end)
+	end, "Find files")
 	map({ "i", "n" }, "<m-cr>", reopen_last_picker, "Reopen last picker")
 	map("i", "<C-w>", "<C-S-w>", "Delete word")
 

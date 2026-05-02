@@ -1,6 +1,7 @@
 local M = {}
 local bootstrap = require('nvimconf.bootstrap')
 local picker_history = require('nvimconf.picker_history')
+local picker_switch = require('nvimconf.picker_switch')
 
 local function normalize_query(query)
   if type(query) ~= 'string' or query == '' then
@@ -342,9 +343,7 @@ local function close_picker()
 end
 
 local function switch_from_picker(open_fn)
-  vim.cmd.stopinsert()
-  close_picker()
-  open_fn()
+  picker_switch.open(open_fn)
 end
 
 local function feed_key_from_picker(key)
@@ -484,6 +483,12 @@ function M.setup()
         end)
       end, 'FFF project picker')
 
+      buffer_map('<m-o>', function()
+        switch_from_picker(function()
+          require('nvimconf.oldfiles_picker').open()
+        end)
+      end, 'FFF oldfiles picker')
+
       local function open_penguin_from_fff()
         switch_from_picker(function()
           require('nvimconf.penguin').open()
@@ -492,7 +497,9 @@ function M.setup()
 
       buffer_map('<m-cr>', function()
         sync_picker_history()
-        require('nvimconf.picker_history').reopen()
+        switch_from_picker(function()
+          require('nvimconf.picker_history').reopen()
+        end)
       end, 'Reopen last picker')
       buffer_map('<m-space>', open_penguin_from_fff, 'FFF command history')
       buffer_map('<esc><cr>', open_penguin_from_fff, 'FFF command history (Esc Enter fallback)')
