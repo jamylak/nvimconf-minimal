@@ -383,14 +383,30 @@ local function create_window(buf, opts)
   return win
 end
 
+local function ensure_prompt_insert()
+  if state.prompt_win and vim.api.nvim_win_is_valid(state.prompt_win) then
+    vim.api.nvim_set_current_win(state.prompt_win)
+    vim.cmd.startinsert()
+  end
+
+  vim.schedule(function()
+    if not state.active then
+      return
+    end
+    if not state.prompt_win or not vim.api.nvim_win_is_valid(state.prompt_win) then
+      return
+    end
+
+    vim.api.nvim_set_current_win(state.prompt_win)
+    vim.cmd.startinsert()
+  end)
+end
+
 function M.open(initial_query)
   remember_open(initial_query)
 
   if state.active then
-    if state.prompt_win and vim.api.nvim_win_is_valid(state.prompt_win) then
-      vim.api.nvim_set_current_win(state.prompt_win)
-      vim.cmd.startinsert()
-    end
+    ensure_prompt_insert()
     return
   end
 
@@ -463,7 +479,7 @@ function M.open(initial_query)
   map({ 'i', 'n' }, '<C-j>', function() select_current(true) end, 'Reuse existing project tab')
   map({ 'i', 'n' }, '<S-CR>', create_project, 'Create project')
   map({ 'i', 'n' }, '<m-n>', function()
-    vim.cmd.startinsert()
+    ensure_prompt_insert()
   end, 'Switch project')
   map({ 'i', 'n' }, '<m-o>', function()
     switch_from_picker(function()
@@ -505,7 +521,7 @@ function M.open(initial_query)
     end,
   })
 
-  vim.cmd.startinsert()
+  ensure_prompt_insert()
 end
 
 function M.close()
