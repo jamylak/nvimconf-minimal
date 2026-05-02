@@ -23,6 +23,24 @@ local function gh(repo)
   return 'https://github.com/' .. repo
 end
 
+local plugin_names = {
+  'plenary.nvim',
+  'nvim-dap',
+  'nvim-nio',
+  'nvim-dap-ui',
+  'nvim-dap-disasm',
+  'nvim-web-devicons',
+  'fff.nvim',
+  'blink.cmp',
+  'grug-far.nvim',
+  'nvim-window',
+  'oil.nvim',
+  'diffview.nvim',
+  'neogit',
+  'nvim-treesitter',
+  'snacks.nvim',
+}
+
 M.plugins_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt')
 M.cplug_dir = vim.fn.expand('~/proj/cplug.nvim')
 M.penguin_dir = vim.fn.expand('~/proj/penguin.nvim')
@@ -75,11 +93,11 @@ end
 local function installed_specs()
   local installed = true
 
-  for _, spec in ipairs(specs()) do
-    local path = vim.fs.joinpath(M.plugins_dir, spec.name)
+  for _, plugin_name in ipairs(plugin_names) do
+    local path = vim.fs.joinpath(M.plugins_dir, plugin_name)
     local stat = vim.uv.fs_stat(path)
     if stat and stat.type == 'directory' then
-      installed_plugins[spec.name] = path
+      installed_plugins[plugin_name] = path
     else
       installed = false
     end
@@ -88,14 +106,16 @@ local function installed_specs()
   return installed
 end
 
-if not (vim.pack and type(vim.pack.add) == 'function') then
-  error('nvimconf-minimal requires Neovim 0.12+ with vim.pack')
-end
-
 local ok_pack, pack_err = pcall(function()
-  if not installed_specs() then
-    vim.pack.add(specs(), { confirm = false, load = false })
+  if installed_specs() then
+    return
   end
+
+  if not (vim.pack and type(vim.pack.add) == 'function') then
+    error('nvimconf-minimal requires Neovim 0.12+ with vim.pack')
+  end
+
+  vim.pack.add(specs(), { confirm = false, load = false })
 end)
 
 if not ok_pack then
