@@ -58,6 +58,9 @@ function M.setup()
     open_on_bare_enter = true,
   })
 
+  -- penguin.nvim owns its prompt UI, so add this config's picker switch keys
+  -- when that prompt buffer appears. The actual transition still goes through
+  -- picker_switch.open so penguin behaves like the in-repo pickers.
   vim.api.nvim_create_autocmd('FileType', {
     pattern = 'penguin-prompt',
     group = vim.api.nvim_create_augroup('nvimconf-minimal.penguin_picker_switch', { clear = true }),
