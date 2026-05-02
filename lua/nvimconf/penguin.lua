@@ -34,6 +34,12 @@ function M.setup()
     return true
   end
 
+  -- Like cplug, penguin may be a local development checkout. Keep it off
+  -- runtimepath until the command palette is first used so empty startup and
+  -- picker benches do not pay for it. When penguin is pack-managed instead,
+  -- bootstrap.require_plugin will still handle the normal plugin load path.
+  bootstrap.ensure_local_runtimepath('penguin.nvim', bootstrap.penguin_dir)
+
   local ok, penguin = pcall(require, 'penguin')
   if not ok then
     vim.schedule(function()

@@ -6,6 +6,10 @@ vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
+vim.g.loaded_matchit = 1
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.g.loaded_remote_plugins = 1
 
 vim.g.fff = {
   lazy_sync = true,
@@ -18,6 +22,7 @@ vim.g.fff = {
 local missing_notified = {}
 local installed_plugins = {}
 local loaded_plugins = {}
+local loaded_local_runtimepaths = {}
 
 local function gh(repo)
   return 'https://github.com/' .. repo
@@ -60,11 +65,6 @@ local function add_runtimepath(path, opts)
   end
   return true
 end
-
--- Use the local checkout directly while iterating on cplug.nvim.
-add_runtimepath(M.cplug_dir, { prepend = true })
--- Use the local checkout directly while iterating on penguin.nvim.
-add_runtimepath(M.penguin_dir, { prepend = true })
 
 local function specs()
   return {
@@ -143,6 +143,27 @@ function M.load_plugin(plugin_name)
   end
 
   loaded_plugins[plugin_name] = true
+  return true
+end
+
+function M.ensure_local_runtimepath(name, path)
+  if type(name) ~= 'string' or name == '' then
+    return false
+  end
+
+  if loaded_local_runtimepaths[name] then
+    return true
+  end
+
+  -- Local checkouts are great while iterating on companion plugins, but they
+  -- should not sit on runtimepath during every startup. Add them only on first
+  -- use; if a plugin moves back under vim.pack later this helper simply stops
+  -- being part of the hot path.
+  if not add_runtimepath(path, { prepend = true }) then
+    return false
+  end
+
+  loaded_local_runtimepaths[name] = true
   return true
 end
 

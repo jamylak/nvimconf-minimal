@@ -8,8 +8,22 @@ end
 
 require("nvimconf.options")
 require("nvimconf.theme").apply()
-require("nvimconf.keymaps")
 require("nvimconf.fff").setup()
+
+-- Keep only the picker hot-path maps on the first frame. The rest of the
+-- keymap file is deferred until VimEnter so empty startup does not pay for the
+-- full mapping set up front.
+vim.keymap.set("n", "<m-n>", function()
+  require("nvimconf.project_picker").open()
+end, { silent = true, desc = "Switch project" })
+
+vim.keymap.set("n", "<m-o>", function()
+  require("nvimconf.oldfiles_picker").open()
+end, { silent = true, desc = "Oldfiles" })
+
+vim.keymap.set("n", "<m-cr>", function()
+  require("nvimconf.picker_history").reopen()
+end, { silent = true, desc = "Reopen last picker" })
 
 vim.api.nvim_create_autocmd("VimEnter", {
   group = vim.api.nvim_create_augroup("nvimconf-minimal.cplug", { clear = true }),
@@ -27,6 +41,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
     vim.schedule(function()
+      -- Most mappings are not needed to reach the first frame or open the core
+      -- pickers, so load them one tick later to trim cold-start latency.
+      require("nvimconf.keymaps")
       require("nvimconf.ui").setup()
     end)
   end,
