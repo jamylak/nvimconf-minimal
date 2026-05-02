@@ -12,31 +12,8 @@ local function ensure_loaded()
   return require('neogit')
 end
 
-local function detect_main_ref()
-  local refs = require('neogit.lib.git.refs')
-  local preferred = {
-    'main',
-    'master',
-    'origin/main',
-    'origin/master',
-  }
-  local available = {}
-
-  for _, ref in ipairs(refs.list_branches()) do
-    available[ref] = true
-  end
-
-  for _, ref in ipairs(refs.heads()) do
-    available[ref] = true
-  end
-
-  for _, ref in ipairs(preferred) do
-    if available[ref] then
-      return ref
-    end
-  end
-
-  return 'main'
+local function ensure_diffview()
+  return bootstrap.require_plugin('diffview', 'diffview.nvim')
 end
 
 load = function()
@@ -74,20 +51,22 @@ local function open_from_command(opts)
 end
 
 local function diff_worktree()
-  if not ensure_loaded() then
+  local diffview = ensure_diffview()
+  if not diffview then
     return
   end
 
-  require('neogit.integrations.diffview').open('worktree')
+  diffview.open({})
 end
 
 local function diff_main(opts)
-  if not ensure_loaded() then
+  local diffview = ensure_diffview()
+  if not diffview then
     return
   end
 
-  local base = opts.args ~= '' and opts.args or detect_main_ref()
-  require('neogit.integrations.diffview').open('range', base .. '..HEAD')
+  local base = opts.args ~= '' and opts.args or 'origin/main'
+  diffview.open({ base .. '..HEAD' })
 end
 
 local function log_current()
