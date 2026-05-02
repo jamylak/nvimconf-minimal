@@ -64,11 +64,14 @@ wait_for_state() {
 
 cd "$REPO_DIR"
 
-script -q /dev/null "$SCRIPT_DIR/test_worktree.sh" --listen "$SOCKET" README.md >"$UI_LOG" 2>&1 &
+script -q /dev/null "$SCRIPT_DIR/launch_worktree.sh" --listen "$SOCKET" README.md >"$UI_LOG" 2>&1 &
 UI_PID=$!
 
 wait_for_socket
 wait_for_state 'markdown:n'
+
+nvim-0.12.0 --server "$SOCKET" --remote-send '<M-Space>'
+wait_for_state 'penguin-prompt:i'
 
 nvim-0.12.0 --server "$SOCKET" --remote-send '<M-o>'
 wait_for_state 'nvimconf-minimal_oldfiles_picker:i'
