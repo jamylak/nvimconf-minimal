@@ -25,20 +25,26 @@ M.plugins_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 
 M.cplug_dir = vim.fn.expand('~/proj/cplug.nvim')
 M.penguin_dir = vim.fn.expand('~/proj/penguin.nvim')
 
-local function add_local_runtimepath(path)
+local function add_runtimepath(path, opts)
+  opts = opts or {}
+
   local stat = vim.uv.fs_stat(path)
   if not stat or stat.type ~= 'directory' then
     return false
   end
 
-  vim.opt.rtp:prepend(path)
+  if opts.prepend then
+    vim.opt.rtp:prepend(path)
+  else
+    vim.opt.rtp:append(path)
+  end
   return true
 end
 
 -- Use the local checkout directly while iterating on cplug.nvim.
-add_local_runtimepath(M.cplug_dir)
+add_runtimepath(M.cplug_dir, { prepend = true })
 -- Use the local checkout directly while iterating on penguin.nvim.
-add_local_runtimepath(M.penguin_dir)
+add_runtimepath(M.penguin_dir, { prepend = true })
 
 local function specs()
   return {
@@ -64,12 +70,26 @@ local function specs()
   }
 end
 
+local function installed_specs()
+  local installed = true
+
+  for _, spec in ipairs(specs()) do
+    if not add_runtimepath(vim.fs.joinpath(M.plugins_dir, spec.name)) then
+      installed = false
+    end
+  end
+
+  return installed
+end
+
 if not (vim.pack and type(vim.pack.add) == 'function') then
   error('nvimconf-minimal requires Neovim 0.12+ with vim.pack')
 end
 
 local ok_pack, pack_err = pcall(function()
-  vim.pack.add(specs(), { confirm = false, load = false })
+  if not installed_specs() then
+    vim.pack.add(specs(), { confirm = false, load = false })
+  end
 end)
 
 if not ok_pack then

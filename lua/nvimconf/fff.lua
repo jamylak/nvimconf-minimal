@@ -2,6 +2,7 @@ local M = {}
 local bootstrap = require('nvimconf.bootstrap')
 local picker_history = require('nvimconf.picker_history')
 local picker_switch = require('nvimconf.picker_switch')
+local setup_done = false
 
 local function normalize_query(query)
   if type(query) ~= 'string' or query == '' then
@@ -418,9 +419,11 @@ local function open_oil_from_picker()
   end)
 end
 
--- Register user-facing commands, keymaps, and picker-local mappings.
-function M.setup()
+local function define_user_commands()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
+  pcall(vim.api.nvim_del_user_command, 'FFFGrep')
+  pcall(vim.api.nvim_del_user_command, 'FFFInstall')
+
   vim.api.nvim_create_user_command('FFFFind', find_files_cmd, {
     nargs = '?',
     complete = function(arg_lead)
@@ -451,6 +454,21 @@ function M.setup()
     download.download_or_build_binary()
   end, {
     desc = 'Download or build the fff.nvim binary',
+  })
+end
+
+-- Register user-facing commands, keymaps, and picker-local mappings.
+function M.setup()
+  if setup_done then
+    return
+  end
+
+  define_user_commands()
+  vim.api.nvim_create_autocmd('VimEnter', {
+    group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_commands', { clear = true }),
+    once = true,
+    callback = define_user_commands,
+    desc = 'Reapply nvimconf FFF commands after plugin startup scripts run',
   })
 
   vim.api.nvim_create_autocmd('FileType', {
@@ -524,6 +542,7 @@ function M.setup()
   vim.keymap.set('n', '<leader>f', find_files, { desc = 'Find files' })
   vim.keymap.set('n', '<leader>ff', find_files, { desc = 'Find files' })
   vim.keymap.set('n', '<leader>fw', live_grep, { desc = 'Project grep' })
+  setup_done = true
 end
 
 M.close = close_picker

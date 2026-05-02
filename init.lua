@@ -16,9 +16,18 @@ require("nvimconf.fff").setup()
 require("nvimconf.grug_far").setup()
 require("nvimconf.lsp").setup()
 require("nvimconf.blink").setup()
-require("nvimconf.cplug").setup()
-require("nvimconf.penguin").setup()
 require("nvimconf.markdown_images").setup()
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = vim.api.nvim_create_augroup("nvimconf-minimal.cplug", { clear = true }),
+  once = true,
+  callback = function()
+    -- Comments are not needed for the first frame, so load cplug after startup.
+    vim.schedule(function()
+      require("nvimconf.cplug").setup()
+    end)
+  end,
+})
 
 vim.api.nvim_create_user_command(
   "TSInstallFavorites",
