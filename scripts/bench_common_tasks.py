@@ -5,6 +5,7 @@ import json
 import os
 import statistics
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -118,6 +119,10 @@ def run_command(args: list[str], env: dict[str, str]) -> None:
         raise RuntimeError(completed.stderr.strip() or f"benchmark command failed: {' '.join(command)}")
 
 
+def report_progress(message: str) -> None:
+    print(message, file=sys.stderr, flush=True)
+
+
 def run_once(scenario: dict[str, object], env: dict[str, str], result_dir: str) -> float:
     result_path = Path(result_dir) / f"{scenario['name']}.txt"
     if result_path.exists():
@@ -175,15 +180,21 @@ def benchmark(iterations: int, warmup: int) -> list[dict[str, object]]:
         env = make_env(config_home, state_home)
         results = []
 
-        for scenario in SCENARIOS:
+        for index, scenario in enumerate(SCENARIOS, start=1):
+            report_progress(f"[{index}/{len(SCENARIOS)}] {scenario['label']}")
             prepare_args = scenario.get("prepare_args")
             if prepare_args:
+                report_progress("  preparing...")
                 run_command(prepare_args, env)
 
-            for _ in range(warmup):
+            for warmup_index in range(1, warmup + 1):
+                report_progress(f"  warmup {warmup_index}/{warmup}")
                 run_once(scenario, env, result_dir)
 
-            samples = [run_once(scenario, env, result_dir) for _ in range(iterations)]
+            samples = []
+            for sample_index in range(1, iterations + 1):
+                report_progress(f"  sample {sample_index}/{iterations}")
+                samples.append(run_once(scenario, env, result_dir))
             results.append(
                 {
                     "name": scenario["name"],
