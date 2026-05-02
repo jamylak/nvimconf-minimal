@@ -60,29 +60,29 @@ load = function()
 end
 
 local function open_from_command(opts)
-  if not load() then
+  local neogit = ensure_loaded()
+  if not neogit then
     return
   end
 
-  vim.api.nvim_cmd({
-    cmd = 'Neogit',
-    args = opts.fargs,
-    bang = opts.bang,
-  }, {})
+  local args = require('neogit.lib.util').parse_command_args(opts.fargs)
+  if opts.bang then
+    args.kind = 'replace'
+  end
+
+  neogit.open(args)
 end
 
 local function diff_worktree()
-  local neogit = ensure_loaded()
-  if not neogit then
+  if not ensure_loaded() then
     return
   end
 
-  neogit.action('diff', 'worktree')()
+  require('neogit.integrations.diffview').open('worktree')
 end
 
 local function diff_main(opts)
-  local neogit = ensure_loaded()
-  if not neogit then
+  if not ensure_loaded() then
     return
   end
 
