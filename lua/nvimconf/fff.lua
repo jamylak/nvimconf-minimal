@@ -3,6 +3,7 @@ local bootstrap = require('nvimconf.bootstrap')
 local picker_history = require('nvimconf.picker_history')
 local picker_switch = require('nvimconf.picker_switch')
 local setup_done = false
+local define_user_commands
 
 local function normalize_query(query)
   if type(query) ~= 'string' or query == '' then
@@ -35,6 +36,7 @@ local function require_fff(module_name)
     return nil
   end
 
+  define_user_commands()
   return module
 end
 
@@ -419,7 +421,7 @@ local function open_oil_from_picker()
   end)
 end
 
-local function define_user_commands()
+define_user_commands = function()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
   pcall(vim.api.nvim_del_user_command, 'FFFGrep')
   pcall(vim.api.nvim_del_user_command, 'FFFInstall')

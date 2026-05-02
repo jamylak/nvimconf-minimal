@@ -16,6 +16,8 @@ vim.g.fff = {
 }
 
 local missing_notified = {}
+local installed_plugins = {}
+local loaded_plugins = {}
 
 local function gh(repo)
   return 'https://github.com/' .. repo
@@ -74,7 +76,11 @@ local function installed_specs()
   local installed = true
 
   for _, spec in ipairs(specs()) do
-    if not add_runtimepath(vim.fs.joinpath(M.plugins_dir, spec.name)) then
+    local path = vim.fs.joinpath(M.plugins_dir, spec.name)
+    local stat = vim.uv.fs_stat(path)
+    if stat and stat.type == 'directory' then
+      installed_plugins[spec.name] = path
+    else
       installed = false
     end
   end
@@ -98,10 +104,39 @@ if not ok_pack then
   end)
 end
 
+function M.load_plugin(plugin_name)
+  if type(plugin_name) ~= 'string' or plugin_name == '' then
+    return false
+  end
+
+  if loaded_plugins[plugin_name] then
+    return true
+  end
+
+  if not installed_plugins[plugin_name] then
+    return false
+  end
+
+  local ok_load = pcall(vim.cmd.packadd, plugin_name)
+  if not ok_load then
+    return false
+  end
+
+  loaded_plugins[plugin_name] = true
+  return true
+end
+
 function M.require_plugin(module_name, plugin_name)
   local ok, mod = pcall(require, module_name)
   if ok then
     return mod
+  end
+
+  if plugin_name and M.load_plugin(plugin_name) then
+    ok, mod = pcall(require, module_name)
+    if ok then
+      return mod
+    end
   end
 
   local key = plugin_name or module_name
