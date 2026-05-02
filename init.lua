@@ -25,6 +25,17 @@ vim.keymap.set("n", "<m-cr>", function()
   require("nvimconf.picker_history").reopen()
 end, { silent = true, desc = "Reopen last picker" })
 
+vim.api.nvim_create_user_command("ProjectPicker", function()
+  require("nvimconf.project_picker").open()
+end, { desc = "Project Picker" })
+
+vim.api.nvim_create_user_command("Oldfiles", function(opts)
+  require("nvimconf.oldfiles_picker").open(opts.args ~= "" and opts.args or nil)
+end, {
+  nargs = "?",
+  desc = "Open oldfiles picker",
+})
+
 vim.api.nvim_create_autocmd("VimEnter", {
   group = vim.api.nvim_create_augroup("nvimconf-minimal.cplug", { clear = true }),
   once = true,

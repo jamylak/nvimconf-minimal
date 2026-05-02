@@ -3,7 +3,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
-TEST_WORKTREE="$SCRIPT_DIR/test_worktree.sh"
+TEST_WORKTREE="$SCRIPT_DIR/launch_worktree.sh"
 
 run_nvim() {
   "$TEST_WORKTREE" --headless "$@" -c qa
