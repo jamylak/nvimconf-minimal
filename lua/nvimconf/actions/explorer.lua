@@ -2,7 +2,28 @@ local M = {}
 
 local function ensure_snacks_explorer()
   return require('nvimconf.snacks').ensure({
-    picker = {},
+    picker = {
+      sources = {
+        explorer = {
+          hidden = true,
+          ignored = true,
+          win = {
+            input = {
+              keys = {
+                ['<leader>h'] = { 'toggle_hidden', mode = { 'n' } },
+                ['<a-.>'] = { 'toggle_hidden', mode = { 'n', 'i' } },
+              },
+            },
+            list = {
+              keys = {
+                ['<leader>h'] = { 'toggle_hidden', mode = { 'n' } },
+                ['<a-.>'] = { 'toggle_hidden', mode = { 'n' } },
+              },
+            },
+          },
+        },
+      },
+    },
     explorer = {},
   })
 end
