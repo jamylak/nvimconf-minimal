@@ -1,6 +1,7 @@
 local M = {}
 local bootstrap = require('nvimconf.bootstrap')
 
+local log_commit_count = 50
 local loaded = false
 local load
 
@@ -70,14 +71,30 @@ local function diff_main(opts)
 end
 
 local function log_current()
-  local neogit = ensure_loaded()
-  if not neogit then
+  if not ensure_loaded() then
     return
   end
 
-  local commits = require('neogit.lib.git').log.list({}, nil, nil, false, false)
-  require('neogit.buffers.log_view').new(commits, {}):open()
-  require('neogit.integrations.diffview').open('range', 'HEAD^..HEAD')
+  local git = require('neogit.lib.git')
+  local diffview = ensure_diffview()
+  if not diffview then
+    return
+  end
+
+  local function commits(offset)
+    local args = { ('--max-count=%d'):format(log_commit_count) }
+    if offset and offset > 0 then
+      table.insert(args, ('--skip=%d'):format(offset))
+    end
+
+    return git.log.list(args, nil, nil, false, false)
+  end
+
+  require('neogit.buffers.log_view')
+    .new(commits(), {}, nil, commits)
+    :open()
+
+  diffview.open({ 'HEAD^..HEAD' })
 end
 
 function M.setup()
