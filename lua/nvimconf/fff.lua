@@ -530,5 +530,6 @@ M.close = close_picker
 M.find_files = find_files
 M.find_files_in_dir = find_files_in_dir
 M.live_grep = live_grep
+picker_switch.register('fff', close_picker)
 
 return M

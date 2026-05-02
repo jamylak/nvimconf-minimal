@@ -1,23 +1,30 @@
 local M = {}
 
-local function call(module_name, method)
-  local ok, module = pcall(require, module_name)
-  if ok and type(module[method]) == 'function' then
-    pcall(module[method])
+local close_order = {}
+local close_by_name = {}
+
+function M.register(name, close_fn)
+  if type(name) ~= 'string' or type(close_fn) ~= 'function' then
+    return
   end
+
+  if not close_by_name[name] then
+    close_order[#close_order + 1] = name
+  end
+
+  close_by_name[name] = close_fn
 end
 
 function M.close_current()
-  call('nvimconf.fff', 'close')
-  call('nvimconf.project_picker', 'close')
-  call('nvimconf.oldfiles_picker', 'close')
-  call('nvimconf.penguin', 'close')
+  for _, name in ipairs(close_order) do
+    pcall(close_by_name[name])
+  end
 end
 
 function M.open(open_fn)
   vim.cmd.stopinsert()
   M.close_current()
-  vim.schedule(open_fn)
+  open_fn()
 end
 
 return M

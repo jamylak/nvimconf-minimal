@@ -516,4 +516,6 @@ function M.project_entries_for_test()
   return project_entries()
 end
 
+picker_switch.register('project_picker', close)
+
 return M

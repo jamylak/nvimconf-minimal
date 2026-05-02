@@ -91,5 +91,6 @@ end
 
 M.open = open_penguin
 M.close = close_penguin
+picker_switch.register('penguin', close_penguin)
 
 return M

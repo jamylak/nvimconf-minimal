@@ -438,4 +438,6 @@ function M.oldfile_entries_for_test()
 	return oldfile_entries()
 end
 
+picker_switch.register("oldfiles_picker", close)
+
 return M

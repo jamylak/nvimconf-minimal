@@ -203,6 +203,26 @@ local function close_all()
   fff_picker_ui.close()
 end
 
+do
+  local picker_switch = require('nvimconf.picker_switch')
+  local original_schedule = vim.schedule
+  local schedule_count = 0
+  local opened = false
+
+  vim.schedule = function(fn)
+    schedule_count = schedule_count + 1
+    return original_schedule(fn)
+  end
+
+  picker_switch.open(function()
+    opened = true
+  end)
+
+  vim.schedule = original_schedule
+  assert_equal(opened, true, 'picker_switch.open is synchronous')
+  assert_equal(schedule_count, 0, 'picker_switch.open schedule count')
+end
+
 vim.v.oldfiles = { repo .. '/README.md' }
 
 require('nvimconf.fff').setup()
