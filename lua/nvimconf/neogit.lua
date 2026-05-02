@@ -17,9 +17,17 @@ local function ensure_diffview()
   return bootstrap.require_plugin('diffview', 'diffview.nvim')
 end
 
+local function ensure_plenary()
+  return bootstrap.require_plugin('plenary.path', 'plenary.nvim')
+end
+
 load = function()
   if loaded then
     return true
+  end
+
+  if not ensure_plenary() then
+    return false
   end
 
   local neogit = bootstrap.require_plugin('neogit', 'neogit')
