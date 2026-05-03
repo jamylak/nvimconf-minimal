@@ -3,6 +3,19 @@ local bootstrap = require('nvimconf.bootstrap')
 local picker_switch = require('nvimconf.picker_switch')
 
 local loaded = false
+local excluded_bare_enter_filetypes = {
+  help = true,
+  netrw = true,
+  qf = true,
+}
+
+local function should_fall_back_bare_enter()
+  local buf = vim.api.nvim_get_current_buf()
+
+  return vim.fn.getcmdwintype() ~= ''
+    or vim.bo[buf].buftype ~= ''
+    or excluded_bare_enter_filetypes[vim.bo[buf].filetype]
+end
 
 local function ensure_prompt_insert()
   vim.schedule(function()
@@ -96,6 +109,27 @@ function M.setup()
 
   loaded = true
   return true
+end
+
+function M.handle_bare_enter()
+  if should_fall_back_bare_enter() then
+    return '<CR>'
+  end
+
+  if not M.setup() then
+    return '<CR>'
+  end
+
+  local ok, penguin = pcall(require, 'penguin')
+  if ok and type(penguin.handle_bare_enter) == 'function' then
+    local result = penguin.handle_bare_enter()
+    ensure_prompt_insert()
+    return result
+  end
+
+  vim.schedule(open_penguin)
+  ensure_prompt_insert()
+  return ''
 end
 
 M.open = open_penguin

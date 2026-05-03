@@ -12,6 +12,17 @@ end
 
 require("nvimconf.options")
 
+-- penguin.nvim has the real bare-Enter logic, but this config lazy-loads the
+-- plugin, so the first <CR> needs a bootstrap mapping to reach it.
+vim.keymap.set("n", "<CR>", function()
+  return require("nvimconf.penguin").handle_bare_enter()
+end, {
+  desc = "Open penguin.nvim on bare Enter",
+  expr = true,
+  noremap = true,
+  silent = true,
+})
+
 local function setup_fff()
   local fff = require("nvimconf.fff")
   fff.setup()

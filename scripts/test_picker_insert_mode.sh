@@ -70,6 +70,12 @@ UI_PID=$!
 wait_for_socket
 wait_for_state 'markdown:n'
 
+nvim-0.12.0 --server "$SOCKET" --remote-send '<CR>'
+wait_for_state 'penguin-prompt:i'
+
+nvim-0.12.0 --server "$SOCKET" --remote-send '<Esc>'
+wait_for_state 'markdown:n'
+
 nvim-0.12.0 --server "$SOCKET" --remote-send '<M-Space>'
 wait_for_state 'penguin-prompt:i'
 
