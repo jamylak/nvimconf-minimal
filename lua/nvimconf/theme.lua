@@ -1,4 +1,5 @@
 local M = {}
+local theme_name = "nvimconf-minimal"
 
 local p = {
 	bg = "#16181a",
@@ -57,7 +58,7 @@ function M.apply()
 	end
 
 	vim.o.termguicolors = true
-	vim.g.colors_name = "nvimconf-minimal"
+	vim.g.colors_name = theme_name
 	vim.opt.fillchars:append({ eob = " " })
 
 	local blink_border = blend(p.bg_highlight, p.grey, 0.7)
@@ -317,6 +318,14 @@ function M.apply()
 		["@variable"] = { fg = p.fg },
 		["@variable.builtin"] = { link = "Special" },
 	})
+end
+
+function M.ensure()
+	if vim.g.colors_name == theme_name then
+		return
+	end
+
+	M.apply()
 end
 
 return M

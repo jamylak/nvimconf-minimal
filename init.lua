@@ -6,6 +6,10 @@ local function treesitter_install(method)
   end
 end
 
+local function ensure_theme()
+  require("nvimconf.theme").ensure()
+end
+
 require("nvimconf.options")
 require("nvimconf.fff").setup()
 
@@ -36,7 +40,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()
     vim.schedule(function()
-      require("nvimconf.theme").apply()
       -- Keep startup focused on the first frame, then install the broader
       -- launcher and editing keymaps one tick later.
       require("nvimconf.keymaps")
@@ -64,6 +67,13 @@ vim.api.nvim_create_autocmd("BufEnter", {
     end
     require("nvimconf.oil").open_startup_directory()
   end,
+})
+
+vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+  group = vim.api.nvim_create_augroup("nvimconf-minimal.theme", { clear = true }),
+  once = true,
+  callback = ensure_theme,
+  desc = "Load theme on first real file buffer",
 })
 
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
