@@ -46,7 +46,7 @@ local plugin_names = {
   'snacks.nvim',
 }
 
-M.plugins_dir = vim.fs.joinpath(vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt')
+M.plugins_dir = table.concat({ vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt' }, '/')
 M.cplug_dir = vim.fn.expand('~/proj/cplug.nvim')
 M.penguin_dir = vim.fn.expand('~/proj/penguin.nvim')
 
@@ -94,7 +94,7 @@ local function installed_specs()
   local installed = true
 
   for _, plugin_name in ipairs(plugin_names) do
-    local path = vim.fs.joinpath(M.plugins_dir, plugin_name)
+    local path = M.plugins_dir .. '/' .. plugin_name
     local stat = vim.uv.fs_stat(path)
     if stat and stat.type == 'directory' then
       installed_plugins[plugin_name] = path
@@ -106,9 +106,11 @@ local function installed_specs()
   return installed
 end
 
-local ok_pack, pack_err = pcall(function()
+local all_plugins_installed = installed_specs()
+
+function M.ensure_plugins_installed()
   if installed_specs() then
-    return
+    return true
   end
 
   if not (vim.pack and type(vim.pack.add) == 'function') then
@@ -116,11 +118,20 @@ local ok_pack, pack_err = pcall(function()
   end
 
   vim.pack.add(specs(), { confirm = false, load = false })
-end)
+  installed_specs()
+  return true
+end
 
-if not ok_pack then
+if not all_plugins_installed then
   vim.schedule(function()
-    vim.notify('vim.pack failed to register plugins: ' .. tostring(pack_err), vim.log.levels.ERROR)
+    if #vim.api.nvim_list_uis() == 0 then
+      return
+    end
+
+    local ok_pack, pack_err = pcall(M.ensure_plugins_installed)
+    if not ok_pack then
+      vim.notify('vim.pack failed to register plugins: ' .. tostring(pack_err), vim.log.levels.ERROR)
+    end
   end)
 end
 
