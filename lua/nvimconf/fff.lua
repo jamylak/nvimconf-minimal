@@ -30,6 +30,12 @@ end
 local open_file_picker
 local live_grep
 
+local function ensure_setup()
+  if not setup_done then
+    M.setup()
+  end
+end
+
 local function require_fff(module_name)
   local module = bootstrap.require_plugin(module_name, 'fff.nvim')
   if not module then
@@ -244,6 +250,8 @@ local function picker_input_query(state)
 end
 
 open_file_picker = function(opts)
+  ensure_setup()
+
   opts = opts or {}
 
   local query = normalize_query(opts.query)
@@ -315,6 +323,8 @@ end
 
 -- Open fff live grep, optionally carrying over query/cwd from the picker.
 live_grep = function(query, cwd)
+  ensure_setup()
+
   query = normalize_query(query)
 
   remember_live_grep(query, cwd)

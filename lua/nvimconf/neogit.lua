@@ -17,6 +17,10 @@ local function ensure_diffview()
   return bootstrap.require_plugin('diffview', 'diffview.nvim')
 end
 
+local function ensure_theme()
+  require('nvimconf.theme').ensure()
+end
+
 local function ensure_plenary()
   return bootstrap.require_plugin('plenary.path', 'plenary.nvim')
 end
@@ -60,6 +64,8 @@ local function open_from_command(opts)
 end
 
 local function diff_worktree()
+  ensure_theme()
+
   local diffview = ensure_diffview()
   if not diffview then
     return
@@ -69,6 +75,8 @@ local function diff_worktree()
 end
 
 local function diff_main(opts)
+  ensure_theme()
+
   local diffview = ensure_diffview()
   if not diffview then
     return
@@ -79,6 +87,8 @@ local function diff_main(opts)
 end
 
 local function log_current()
+  ensure_theme()
+
   if not ensure_loaded() then
     return
   end

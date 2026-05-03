@@ -10,6 +10,7 @@ opt.splitbelow = true
 opt.splitright = true
 opt.cursorline = true
 opt.signcolumn = "yes"
+opt.termguicolors = true
 
 -- ui2 makes cmdheight=0 viable enough to hide the command area without
 -- falling back to the old press-enter message flow.

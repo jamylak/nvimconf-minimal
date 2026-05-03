@@ -11,7 +11,77 @@ local function ensure_theme()
 end
 
 require("nvimconf.options")
-require("nvimconf.fff").setup()
+
+local function setup_fff()
+  local fff = require("nvimconf.fff")
+  fff.setup()
+  return fff
+end
+
+local function fff_dir_complete(arg_lead)
+  local dirs = vim.fn.glob(arg_lead .. "*", false, true)
+  local results = {}
+  for _, dir in ipairs(dirs) do
+    if vim.fn.isdirectory(dir) == 1 then
+      results[#results + 1] = dir
+    end
+  end
+  return results
+end
+
+vim.api.nvim_create_user_command("FFFFind", function(opts)
+  setup_fff()
+  if opts.args ~= "" then
+    vim.cmd.FFFFind(opts.args)
+  else
+    vim.cmd.FFFFind()
+  end
+end, {
+  nargs = "?",
+  complete = fff_dir_complete,
+  desc = "Find files with FFF",
+})
+
+vim.api.nvim_create_user_command("FFFGrep", function(opts)
+  setup_fff().live_grep(opts.args ~= "" and opts.args or nil)
+end, {
+  nargs = "?",
+  desc = "Open FFF live grep",
+})
+
+vim.api.nvim_create_user_command("FFFInstall", function()
+  setup_fff()
+  vim.cmd.FFFInstall()
+end, {
+  desc = "Download or build the fff.nvim binary",
+})
+
+local function setup_fff_keymaps()
+  vim.keymap.set("n", "<c-return>", function()
+    setup_fff().find_files()
+  end, { desc = "Find files" })
+  vim.keymap.set("n", "<m-u>", function()
+    setup_fff().live_grep()
+  end, { desc = "Project grep" })
+  vim.keymap.set("n", "<leader>f", function()
+    setup_fff().find_files()
+  end, { desc = "Find files" })
+  vim.keymap.set("n", "<leader>ff", function()
+    setup_fff().find_files()
+  end, { desc = "Find files" })
+  vim.keymap.set("n", "<leader>fw", function()
+    setup_fff().live_grep()
+  end, { desc = "Project grep" })
+end
+
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = vim.api.nvim_create_augroup("nvimconf-minimal.fff_keymaps", { clear = true }),
+  once = true,
+  callback = function()
+    vim.schedule(setup_fff_keymaps)
+  end,
+  desc = "Install FFF keymaps after startup",
+})
 
 vim.api.nvim_create_user_command("ProjectPicker", function()
   require("nvimconf.project_picker").open()

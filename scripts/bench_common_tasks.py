@@ -10,19 +10,19 @@ import tempfile
 from pathlib import Path
 
 
-REPO_DIR = Path(__file__).resolve().parent.parent
-APP_NAME = REPO_DIR.name
 SCRIPT_BIN = "/usr/bin/script"
 NVIM_BIN = "nvim-0.12.0"
+DEFAULT_TIMEOUT_SECONDS = 15
+REPO_DIR = Path(__file__).resolve().parent.parent
 
 
 def lua_string(value: str) -> str:
     return "'" + value.replace("\\", "\\\\").replace("'", "\\'") + "'"
 
 
-def repo_files(limit: int) -> list[str]:
+def repo_files(repo_dir: Path, limit: int) -> list[str]:
     files: list[str] = []
-    for path in sorted(REPO_DIR.rglob("*")):
+    for path in sorted(repo_dir.rglob("*")):
         if len(files) >= limit:
             break
         if not path.is_file():
@@ -31,10 +31,6 @@ def repo_files(limit: int) -> list[str]:
             continue
         files.append(str(path))
     return files
-
-
-OLDFILES = repo_files(80)
-OLDFILES_LUA = "{ " + ", ".join(lua_string(path) for path in OLDFILES) + " }"
 
 
 def wait_for(filetype: str) -> str:
@@ -46,7 +42,35 @@ def wait_for(filetype: str) -> str:
     )
 
 
-SCENARIOS = [
+def diffview_ready() -> str:
+    return (
+        "local ok = vim.wait(5000, function() "
+        "for _, buf in ipairs(vim.api.nvim_list_bufs()) do "
+        "if vim.api.nvim_buf_get_name(buf):match('^diffview://') then return true end "
+        "end "
+        "return false "
+        "end, 10); "
+        "if not ok then vim.cmd('cquit') end"
+    )
+
+
+def neogit_log_ready() -> str:
+    return (
+        "local ok = vim.wait(5000, function() "
+        "for _, buf in ipairs(vim.api.nvim_list_bufs()) do "
+        "if vim.bo[buf].filetype == 'NeogitLogView' then return true end "
+        "end "
+        "return false "
+        "end, 10); "
+        "if not ok then vim.cmd('cquit') end"
+    )
+
+
+def scenarios(repo_dir: Path) -> list[dict[str, object]]:
+    oldfiles = repo_files(repo_dir, 80)
+    oldfiles_lua = "{ " + ", ".join(lua_string(path) for path in oldfiles) + " }"
+
+    return [
     {
         "name": "empty-startup",
         "label": "Open empty Neovim",
@@ -56,14 +80,6 @@ SCENARIOS = [
     {
         "name": "fffind",
         "label": "Open with -c FFFFind",
-        "prepare_args": [
-            "-c",
-            "lua require('nvimconf.fff').find_files()",
-            "-c",
-            "lua " + wait_for("fff_input"),
-            "-c",
-            "qa",
-        ],
         "args": ["-c", "FFFFind"],
         "ready_lua": wait_for("fff_input"),
     },
@@ -81,39 +97,65 @@ SCENARIOS = [
         "label": "Open oldfiles picker",
         "args": [
             "-c",
-            f"lua vim.v.oldfiles = {OLDFILES_LUA}; require('nvimconf.oldfiles_picker').open()",
+            f"lua vim.v.oldfiles = {oldfiles_lua}; require('nvimconf.oldfiles_picker').open()",
         ],
         "ready_lua": wait_for("nvimconf-minimal_oldfiles_picker"),
     },
-]
+    {
+        "name": "neogit-diff",
+        "label": "Open with -c NeogitDiff",
+        "args": ["-c", "NeogitDiff"],
+        "ready_lua": diffview_ready(),
+    },
+    {
+        "name": "neogit-diff-main",
+        "label": "Open with -c NeogitDiffMain",
+        "args": ["-c", "NeogitDiffMain"],
+        "ready_lua": diffview_ready(),
+    },
+    {
+        "name": "neogit-log",
+        "label": "Open with -c NeogitLog",
+        "args": ["-c", "NeogitLog"],
+        "ready_lua": neogit_log_ready(),
+    },
+    ]
 
 
-def make_env(config_home: str, state_home: str) -> dict[str, str]:
+def make_env(repo_dir: Path, config_home: str, state_home: str, cache_home: str) -> dict[str, str]:
     env = os.environ.copy()
-    env["NVIM_APPNAME"] = APP_NAME
+    env["NVIM_APPNAME"] = repo_dir.name
     env["XDG_CONFIG_HOME"] = config_home
     env["XDG_STATE_HOME"] = state_home
+    env["XDG_CACHE_HOME"] = cache_home
     return env
 
 
-def ensure_config_home(config_home: str) -> None:
-    config_link = Path(config_home) / APP_NAME
+def command_prefix(headless: bool) -> list[str]:
+    if headless:
+        return [NVIM_BIN, "--headless"]
+    return [SCRIPT_BIN, "-q", "/dev/null", NVIM_BIN]
+
+
+def ensure_config_home(repo_dir: Path, config_home: str) -> None:
+    config_link = Path(config_home) / repo_dir.name
     config_link.parent.mkdir(parents=True, exist_ok=True)
     if config_link.exists() or config_link.is_symlink():
         config_link.unlink()
-    config_link.symlink_to(REPO_DIR)
+    config_link.symlink_to(repo_dir)
 
 
-def run_command(args: list[str], env: dict[str, str]) -> None:
-    command = [SCRIPT_BIN, "-q", "/dev/null", NVIM_BIN, *args]
+def run_command(repo_dir: Path, args: list[str], env: dict[str, str], headless: bool, timeout: float) -> None:
+    command = [*command_prefix(headless), *args]
     completed = subprocess.run(
         command,
-        cwd=REPO_DIR,
+        cwd=repo_dir,
         env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         text=True,
         check=False,
+        timeout=timeout,
     )
     if completed.returncode != 0:
         raise RuntimeError(completed.stderr.strip() or f"benchmark command failed: {' '.join(command)}")
@@ -123,7 +165,14 @@ def report_progress(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
 
 
-def run_once(scenario: dict[str, object], env: dict[str, str], result_dir: str) -> float:
+def run_once(
+    repo_dir: Path,
+    scenario: dict[str, object],
+    env: dict[str, str],
+    result_dir: str,
+    headless: bool,
+    timeout: float,
+) -> float:
     result_path = Path(result_dir) / f"{scenario['name']}.txt"
     if result_path.exists():
         result_path.unlink()
@@ -136,26 +185,24 @@ def run_once(scenario: dict[str, object], env: dict[str, str], result_dir: str) 
         f"vim.fn.writefile({{ string.format('%.3f', (vim.uv.hrtime() - _G.nvimconf_bench_start_ns) / 1e6) }}, {lua_string(str(result_path))})"
     )
     command = [
-        SCRIPT_BIN,
-        "-q",
-        "/dev/null",
-        NVIM_BIN,
+        *command_prefix(headless),
         "--cmd",
         "lua _G.nvimconf_bench_start_ns = vim.uv.hrtime()",
         *scenario["args"],
         "-c",
         final_lua,
         "-c",
-        "qa",
+        "qa!",
     ]
     completed = subprocess.run(
         command,
-        cwd=REPO_DIR,
+        cwd=repo_dir,
         env=env,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         text=True,
         check=False,
+        timeout=timeout,
     )
     if completed.returncode != 0:
         raise RuntimeError(completed.stderr.strip() or f"benchmark command failed: {' '.join(command)}")
@@ -172,29 +219,32 @@ def summarize(samples: list[float]) -> dict[str, float]:
     }
 
 
-def benchmark(iterations: int, warmup: int) -> list[dict[str, object]]:
+def benchmark(repo_dir: Path, iterations: int, warmup: int, headless: bool, timeout: float) -> list[dict[str, object]]:
     with tempfile.TemporaryDirectory(prefix="nvimconf-bench-config-") as config_home, tempfile.TemporaryDirectory(
         prefix="nvimconf-bench-state-"
-    ) as state_home, tempfile.TemporaryDirectory(prefix="nvimconf-bench-results-") as result_dir:
-        ensure_config_home(config_home)
-        env = make_env(config_home, state_home)
+    ) as state_home, tempfile.TemporaryDirectory(prefix="nvimconf-bench-cache-") as cache_home, tempfile.TemporaryDirectory(
+        prefix="nvimconf-bench-results-"
+    ) as result_dir:
+        ensure_config_home(repo_dir, config_home)
+        env = make_env(repo_dir, config_home, state_home, cache_home)
         results = []
 
-        for index, scenario in enumerate(SCENARIOS, start=1):
-            report_progress(f"[{index}/{len(SCENARIOS)}] {scenario['label']}")
+        selected_scenarios = scenarios(repo_dir)
+        for index, scenario in enumerate(selected_scenarios, start=1):
+            report_progress(f"[{index}/{len(selected_scenarios)}] {scenario['label']}")
             prepare_args = scenario.get("prepare_args")
             if prepare_args:
                 report_progress("  preparing...")
-                run_command(prepare_args, env)
+                run_command(repo_dir, prepare_args, env, headless, timeout)
 
             for warmup_index in range(1, warmup + 1):
                 report_progress(f"  warmup {warmup_index}/{warmup}")
-                run_once(scenario, env, result_dir)
+                run_once(repo_dir, scenario, env, result_dir, headless, timeout)
 
             samples = []
             for sample_index in range(1, iterations + 1):
                 report_progress(f"  sample {sample_index}/{iterations}")
-                samples.append(run_once(scenario, env, result_dir))
+                samples.append(run_once(repo_dir, scenario, env, result_dir, headless, timeout))
             results.append(
                 {
                     "name": scenario["name"],
@@ -222,9 +272,12 @@ def main() -> None:
     parser.add_argument("--iterations", type=int, default=10)
     parser.add_argument("--warmup", type=int, default=2)
     parser.add_argument("--format", choices=("table", "json"), default="table")
+    parser.add_argument("--headless", action="store_true", help="Run nvim --headless instead of through a pty.")
+    parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT_SECONDS)
+    parser.add_argument("--repo-dir", type=Path, default=REPO_DIR)
     args = parser.parse_args()
 
-    results = benchmark(args.iterations, args.warmup)
+    results = benchmark(args.repo_dir.resolve(), args.iterations, args.warmup, args.headless, args.timeout)
     if args.format == "json":
         print(json.dumps(results, indent=2))
     else:
