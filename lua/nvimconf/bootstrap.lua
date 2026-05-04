@@ -123,16 +123,12 @@ function M.ensure_plugins_installed()
 end
 
 if not all_plugins_installed then
-  vim.schedule(function()
-    if #vim.api.nvim_list_uis() == 0 then
-      return
-    end
-
-    local ok_pack, pack_err = pcall(M.ensure_plugins_installed)
-    if not ok_pack then
+  local ok_pack, pack_err = pcall(M.ensure_plugins_installed)
+  if not ok_pack then
+    vim.schedule(function()
       vim.notify('vim.pack failed to register plugins: ' .. tostring(pack_err), vim.log.levels.ERROR)
-    end
-  end)
+    end)
+  end
 end
 
 function M.load_plugin(plugin_name)
