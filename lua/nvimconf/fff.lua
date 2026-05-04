@@ -569,8 +569,10 @@ function M.setup()
 
   vim.keymap.set('n', '<c-return>', find_files, { desc = 'Find files' })
   vim.keymap.set('n', '<m-u>', live_grep, { desc = 'Project grep' })
-  vim.keymap.set('n', '<leader>f', find_files, { desc = 'Find files' })
   vim.keymap.set('n', '<leader>ff', find_files, { desc = 'Find files' })
+  vim.keymap.set('n', '<leader>fc', function()
+    live_grep(vim.fn.expand('<cword>'))
+  end, { desc = 'Find current word' })
   vim.keymap.set('n', '<leader>fw', live_grep, { desc = 'Project grep' })
   setup_done = true
 end
