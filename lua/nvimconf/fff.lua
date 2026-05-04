@@ -487,6 +487,14 @@ define_user_commands = function()
   })
 end
 
+local function get_buffer_cwd()
+  local path = vim.api.nvim_buf_get_name(0)
+  if path:match('^oil://') then
+    return path:sub(7)
+  end
+  return vim.fn.expand('%:p:h')
+end
+
 -- Register user-facing commands, keymaps, and picker-local mappings.
 function M.setup()
   if setup_done then
@@ -574,6 +582,16 @@ function M.setup()
     live_grep(vim.fn.expand('<cword>'))
   end, { desc = 'Find current word' })
   vim.keymap.set('n', '<leader>fw', live_grep, { desc = 'Project grep' })
+
+  vim.keymap.set('n', '<leader>sf', function()
+    find_files(nil, get_buffer_cwd())
+  end, { desc = 'Find files (cwd)' })
+  vim.keymap.set('n', '<leader>sc', function()
+    live_grep(vim.fn.expand('<cword>'), get_buffer_cwd())
+  end, { desc = 'Find current word (cwd)' })
+  vim.keymap.set('n', '<leader>sw', function()
+    live_grep(nil, get_buffer_cwd())
+  end, { desc = 'Project grep (cwd)' })
   setup_done = true
 end
 

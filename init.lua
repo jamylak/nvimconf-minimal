@@ -68,6 +68,14 @@ end, {
 })
 
 local function setup_fff_keymaps()
+  local function get_buffer_cwd()
+    local path = vim.api.nvim_buf_get_name(0)
+    if path:match("^oil://") then
+      return path:sub(7)
+    end
+    return vim.fn.expand("%:p:h")
+  end
+
   vim.keymap.set("n", "<c-return>", function()
     setup_fff().find_files()
   end, { desc = "Find files" })
@@ -83,6 +91,16 @@ local function setup_fff_keymaps()
   vim.keymap.set("n", "<leader>fw", function()
     setup_fff().live_grep()
   end, { desc = "Project grep" })
+
+  vim.keymap.set("n", "<leader>sf", function()
+    setup_fff().find_files(nil, get_buffer_cwd())
+  end, { desc = "Find files (cwd)" })
+  vim.keymap.set("n", "<leader>sc", function()
+    setup_fff().live_grep(vim.fn.expand("<cword>"), get_buffer_cwd())
+  end, { desc = "Find current word (cwd)" })
+  vim.keymap.set("n", "<leader>sw", function()
+    setup_fff().live_grep(nil, get_buffer_cwd())
+  end, { desc = "Project grep (cwd)" })
 end
 
 vim.api.nvim_create_autocmd("VimEnter", {
