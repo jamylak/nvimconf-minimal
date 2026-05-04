@@ -1,1 +1,0 @@
-- Check into some LSP telescope style search over eg. `gr` and such, is there 0.12.0 native way to do this? Best new approach?

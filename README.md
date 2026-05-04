@@ -1,7 +1,5 @@
 # nvimconf-minimal
 
-🚧 Work in progress. I am still fixing it.
-
 Minimal Neovim config focused on migrating `jamylak/nvimconf`, supporting Neovim `0.12.0+`, and staying faster and simpler by using builtin `vim.pack` for plugin management.
 
 Main bindings: `:FFFFind`, `<C-Return>` for files, `<M-u>` for grep.
@@ -14,13 +12,6 @@ neovim 0.12.0+
 ```
 
 On first start, Neovim installs managed plugins through `vim.pack`.
-
-If plugin install fails, run:
-
-```vim
-:lua vim.pack.update()
-:restart
-```
 
 The `fff.nvim` native binary auto-installs on first use. If you want to do it manually instead, run `:FFFInstall`.
 
