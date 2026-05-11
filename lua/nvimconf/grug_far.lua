@@ -31,10 +31,36 @@ local function open(opts)
   if not ensure_loaded() then
     return
   end
-  require('grug-far').open(opts or {})
+  return require('grug-far').open(opts or {})
 end
 
 M.open = open
+
+function M.replace_current_word_in_file()
+  local word = vim.fn.expand('<cword>')
+  local file = vim.api.nvim_buf_get_name(0)
+
+  if word == '' then
+    vim.notify('No word under cursor', vim.log.levels.WARN)
+    return
+  end
+
+  if file == '' then
+    vim.notify('Current buffer has no file path', vim.log.levels.WARN)
+    return
+  end
+
+  return open({
+    startCursorRow = 2,
+    startInInsertMode = true,
+    prefills = {
+      search = word,
+      replacement = '',
+      flags = '-i --fixed-strings',
+      paths = file,
+    },
+  })
+end
 
 function M.ensure_loaded_for_test()
   return ensure_loaded()
