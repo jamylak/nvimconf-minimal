@@ -15,8 +15,8 @@ local function ensure_loaded()
 
   grug_far.setup({
     keymaps = {
-      qflist = { n = 'q' },
-      close = { n = '<localleader>q' },
+      qflist = false,
+      close = { n = 'q' },
     },
     prefills = {
       flags = '-i',
