@@ -41,6 +41,7 @@ local plugin_names = {
   'nvim-window',
   'oil.nvim',
   'diffview.nvim',
+  'gitsigns.nvim',
   'neogit',
   'nvim-treesitter',
   'snacks.nvim',
@@ -86,6 +87,7 @@ local function specs()
     { src = gh('jamylak/nvim-window'), name = 'nvim-window', version = 'feature/disable-hints' },
     { src = gh('stevearc/oil.nvim'), name = 'oil.nvim' },
     { src = gh('sindrets/diffview.nvim'), name = 'diffview.nvim' },
+    { src = gh('lewis6991/gitsigns.nvim'), name = 'gitsigns.nvim' },
     { src = gh('NeogitOrg/neogit'), name = 'neogit' },
     { src = gh('nvim-treesitter/nvim-treesitter'), name = 'nvim-treesitter' },
     { src = gh('folke/snacks.nvim'), name = 'snacks.nvim' },
@@ -135,7 +137,9 @@ if not all_plugins_installed then
   end
 end
 
-function M.load_plugin(plugin_name)
+function M.load_plugin(plugin_name, opts)
+  opts = opts or {}
+
   if type(plugin_name) ~= 'string' or plugin_name == '' then
     return false
   end
@@ -148,7 +152,12 @@ function M.load_plugin(plugin_name)
     return false
   end
 
-  local ok_load = pcall(vim.cmd.packadd, plugin_name)
+  local ok_load
+  if opts.plugin_scripts == false then
+    ok_load = pcall(vim.cmd.packadd, { args = { plugin_name }, bang = true })
+  else
+    ok_load = pcall(vim.cmd.packadd, plugin_name)
+  end
   if not ok_load then
     return false
   end

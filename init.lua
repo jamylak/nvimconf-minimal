@@ -184,6 +184,18 @@ vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   desc = "Load LSP wiring on first real file buffer",
 })
 
+vim.api.nvim_create_autocmd("VimEnter", {
+  group = vim.api.nvim_create_augroup("nvimconf-minimal.gitsigns", { clear = true }),
+  once = true,
+  callback = function()
+    -- Let the first frame render before adding git signs to file buffers.
+    vim.defer_fn(function()
+      require("nvimconf.gitsigns").setup()
+    end, 150)
+  end,
+  desc = "Load gitsigns after the first frame",
+})
+
 vim.api.nvim_create_user_command("Neogit", function(opts)
   require("nvimconf.neogit").open_from_command(opts)
 end, {
