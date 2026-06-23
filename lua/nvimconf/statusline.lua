@@ -134,6 +134,13 @@ local function segment(group, value)
   return hl(group) .. " " .. escape(value) .. " "
 end
 
+local function compact_segment(group, value)
+  if value == nil or value == "" then
+    return ""
+  end
+  return hl(group) .. " " .. escape(value) .. " "
+end
+
 local function format_size(bytes)
   if type(bytes) ~= "number" then
     return ""
@@ -193,19 +200,19 @@ local function git_status(bufnr)
 
   local parts = {}
   if dict.head and dict.head ~= "" then
-    parts[#parts + 1] = " " .. dict.head
+    parts[#parts + 1] = compact_segment("NvimconfStatusGitBranch", " " .. dict.head)
   end
   if (dict.added or 0) > 0 then
-    parts[#parts + 1] = " " .. dict.added
+    parts[#parts + 1] = compact_segment("NvimconfStatusGitAdd", " " .. dict.added)
   end
   if (dict.changed or 0) > 0 then
-    parts[#parts + 1] = " " .. dict.changed
+    parts[#parts + 1] = compact_segment("NvimconfStatusGitChange", " " .. dict.changed)
   end
   if (dict.removed or 0) > 0 then
-    parts[#parts + 1] = " " .. dict.removed
+    parts[#parts + 1] = compact_segment("NvimconfStatusGitDelete", " " .. dict.removed)
   end
 
-  return table.concat(parts, " ")
+  return table.concat(parts)
 end
 
 local function diagnostics(bufnr)
@@ -272,7 +279,7 @@ function M.active()
 
   local left = {
     segment(mode_hl(), mode()),
-    segment("NvimconfStatusGit", git),
+    git,
     diag,
     file,
   }
@@ -351,7 +358,10 @@ local function set_highlights()
     NvimconfStatusModeReplace = { fg = colors.black, bg = colors.red, bold = true },
     NvimconfStatusModeCommand = { fg = colors.black, bg = colors.orange, bold = true },
     NvimconfStatusModeTerminal = { fg = colors.black, bg = colors.purple, bold = true },
-    NvimconfStatusGit = { fg = colors.cyan, bg = colors.bg_alt, bold = true },
+    NvimconfStatusGitBranch = { fg = colors.blue, bg = colors.bg_alt, bold = true },
+    NvimconfStatusGitAdd = { fg = colors.green, bg = colors.bg_alt, bold = true },
+    NvimconfStatusGitChange = { fg = colors.orange, bg = colors.bg_alt, bold = true },
+    NvimconfStatusGitDelete = { fg = colors.red, bg = colors.bg_alt, bold = true },
     NvimconfStatusDiagnosticError = { fg = colors.red, bg = colors.bg_alt, bold = true },
     NvimconfStatusDiagnosticWarn = { fg = colors.yellow, bg = colors.bg_alt, bold = true },
     NvimconfStatusDiagnosticInfo = { fg = colors.blue, bg = colors.bg_alt, bold = true },
