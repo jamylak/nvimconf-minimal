@@ -1,6 +1,9 @@
 local M = {}
 
+local bootstrap = require("nvimconf.bootstrap")
+
 local function ensure_snacks_explorer()
+  bootstrap.load_plugin("nvim-web-devicons")
   return require('nvimconf.snacks').ensure({
     picker = {
       sources = {
