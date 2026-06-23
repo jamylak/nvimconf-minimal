@@ -142,6 +142,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
       -- Keep startup focused on the first frame, then install the broader
       -- launcher and editing keymaps one tick later.
       require("nvimconf.keymaps")
+      if vim.g.nvimconf_disable_statusline ~= 1 then
+        require("nvimconf.statusline").setup()
+      end
       require("nvimconf.ui").setup()
     end)
   end,

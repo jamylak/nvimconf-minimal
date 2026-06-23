@@ -131,7 +131,7 @@ function M.setup()
   if type(gitsigns.attach) == "function" then
     for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
       if is_normal_file_buffer(bufnr) then
-        pcall(gitsigns.attach, bufnr)
+        pcall(gitsigns.attach, { bufnr = bufnr, trigger = "nvimconf-minimal" })
       end
     end
   end
