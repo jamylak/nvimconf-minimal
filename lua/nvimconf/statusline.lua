@@ -264,6 +264,21 @@ local function file_info(bufnr)
   return table.concat(parts, " ")
 end
 
+local function scroll_marker()
+  local current = vim.fn.line(".")
+  local total = vim.fn.line("$")
+  if total <= 1 or current <= 1 then
+    return "Top"
+  end
+  if current >= total then
+    return "Bot"
+  end
+
+  local marks = { "▁", "▂", "▃", "▄", "▅", "▆", "▇" }
+  local index = math.min(#marks, math.max(1, math.ceil((current / total) * #marks)))
+  return marks[index]
+end
+
 function M.active()
   local winid = statusline_win()
   local bufnr = statusline_buf(winid)
@@ -287,6 +302,7 @@ function M.active()
   local right = {
     segment("NvimconfStatusFiletype", label),
     segment("NvimconfStatusInfo", info),
+    segment("NvimconfStatusScroll", scroll_marker()),
     hl("NvimconfStatusPosition") .. " %3p%%  %l:%c ",
   }
 
@@ -369,6 +385,7 @@ local function set_highlights()
     NvimconfStatusFile = { fg = colors.fg, bg = colors.bg_alt, bold = true },
     NvimconfStatusFiletype = { fg = colors.magenta, bg = colors.bg_alt, bold = true },
     NvimconfStatusInfo = { fg = colors.fg, bg = colors.bg_alt },
+    NvimconfStatusScroll = { fg = colors.yellow, bg = colors.bg_alt, bold = true },
     NvimconfStatusPosition = { fg = colors.black, bg = colors.cyan, bold = true },
   }
 
