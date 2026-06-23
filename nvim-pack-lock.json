@@ -10,7 +10,7 @@
       "src": "https://github.com/sindrets/diffview.nvim"
     },
     "fff.nvim": {
-      "rev": "1c2c0633cdb933a9b4111d9e6dfa4a476a35ff9f",
+      "rev": "957f222da76f120868defdf9e7204309c3800e5e",
       "src": "https://github.com/dmtrKovalenko/fff.nvim"
     },
     "grug-far.nvim": {
