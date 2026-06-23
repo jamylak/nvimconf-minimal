@@ -24,6 +24,7 @@ end, {
 })
 
 local function setup_fff()
+  bootstrap.load_plugin("nvim-web-devicons")
   local fff = require("nvimconf.fff")
   fff.setup()
   return fff
