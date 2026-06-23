@@ -44,6 +44,7 @@ local plugin_names = {
   'neogit',
   'nvim-treesitter',
   'snacks.nvim',
+  'trouble.nvim',
   'guh.nvim',
 }
 
@@ -88,6 +89,7 @@ local function specs()
     { src = gh('NeogitOrg/neogit'), name = 'neogit' },
     { src = gh('nvim-treesitter/nvim-treesitter'), name = 'nvim-treesitter' },
     { src = gh('folke/snacks.nvim'), name = 'snacks.nvim' },
+    { src = gh('folke/trouble.nvim'), name = 'trouble.nvim' },
     { src = gh('justinmk/guh.nvim'), name = 'guh.nvim' },
   }
 end
