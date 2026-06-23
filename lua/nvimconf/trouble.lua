@@ -32,6 +32,10 @@ local function ensure_trouble()
   return trouble
 end
 
+local function symbols_width()
+  return math.min(math.max(45, math.floor(vim.o.columns * 0.34)), 72)
+end
+
 function M.preset()
   local trouble = ensure_trouble()
   if not trouble then
@@ -44,7 +48,7 @@ function M.preset()
     return
   end
 
-  trouble.open({ mode = "symbols", new = true, focus = false })
+  trouble.open({ mode = "symbols", new = true, focus = false, win = { position = "right", size = symbols_width() } })
   trouble.open({ mode = "lsp", new = true, focus = false, win = { position = "bottom" } })
 end
 
