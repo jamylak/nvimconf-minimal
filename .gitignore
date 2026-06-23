@@ -4,3 +4,4 @@ startuptime-nvimconf2.log
 .state/nvimconf2
 .cache-test/nvim/luac
 nvim.log
+scripts/__pycache__
