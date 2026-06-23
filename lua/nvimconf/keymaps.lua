@@ -271,6 +271,10 @@ map("n", ">t", ":tabmove+1<CR>", { silent = true, desc = "Move tab right" })
 map("n", "<T", ":tabmove 0<CR>", { silent = true, desc = "Move tab far left" })
 map("n", ">T", ":tabmove $<CR>", { silent = true, desc = "Move tab far right" })
 
+-- Text objects
+map({ "o", "x" }, "iq", 'i"', { silent = true, desc = "Inner double quotes" })
+map({ "o", "x" }, "aq", 'a"', { silent = true, desc = "Around double quotes" })
+
 -- Motions and edits
 map_each("n", { "qk", "<C-e>" }, "$", { silent = true, desc = "End of line" })
 map("v", "<C-e>", "$", { silent = true, desc = "End of line" })
