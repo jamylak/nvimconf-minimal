@@ -44,6 +44,7 @@ local plugin_names = {
   'neogit',
   'nvim-treesitter',
   'snacks.nvim',
+  'guh.nvim',
 }
 
 M.plugins_dir = table.concat({ vim.fn.stdpath('data'), 'site', 'pack', 'core', 'opt' }, '/')
@@ -87,6 +88,7 @@ local function specs()
     { src = gh('NeogitOrg/neogit'), name = 'neogit' },
     { src = gh('nvim-treesitter/nvim-treesitter'), name = 'nvim-treesitter' },
     { src = gh('folke/snacks.nvim'), name = 'snacks.nvim' },
+    { src = gh('justinmk/guh.nvim'), name = 'guh.nvim' },
   }
 end
 

@@ -23,4 +23,4 @@ else
   ln -s "$REPO_DIR" "$CONFIG_LINK"
 fi
 
-exec env NVIM_APPNAME="$APP_NAME" nvim-0.12.0 "$@"
+exec env NVIM_APPNAME="$APP_NAME" nvim "$@"

@@ -17,6 +17,10 @@
       "rev": "37d0eafc6a2dcf8641aa19fc2a8db5e391b7f16b",
       "src": "https://github.com/MagicDuck/grug-far.nvim"
     },
+    "guh.nvim": {
+      "rev": "80dbc5b153c030575065d426cace26fa6e92826b",
+      "src": "https://github.com/justinmk/guh.nvim"
+    },
     "neogit": {
       "rev": "d1cfc4986195239cac55700b675cea7a9578d430",
       "src": "https://github.com/NeogitOrg/neogit"
