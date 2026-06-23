@@ -449,6 +449,82 @@ local function open_oil_from_picker()
   end)
 end
 
+local function selected_item_query(state, item)
+  if not item then
+    return nil
+  end
+
+  local query = item.relative_path or item.path or item.name
+  if type(query) ~= 'string' or query == '' then
+    return nil
+  end
+
+  local base_path = state.config and state.config.base_path or nil
+  if item.path and query == item.path and base_path and base_path ~= '' then
+    local relative = vim.fn.fnamemodify(item.path, ':~:.')
+    local base_relative = vim.fn.fnamemodify(base_path, ':~:.')
+    if vim.startswith(relative, base_relative .. '/') then
+      query = relative:sub(#base_relative + 2)
+    else
+      query = relative
+    end
+  end
+
+  if item.line_number and item.line_number > 0 then
+    query = query .. ':' .. item.line_number
+    if item.col and item.col > 0 then
+      query = query .. ':' .. (item.col + 1)
+    end
+  end
+
+  return query
+end
+
+local function complete_prompt_with_selected_item()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if not ok or not picker_ui.state or not picker_ui.state.active then
+    return '<End>'
+  end
+
+  local state = picker_ui.state
+  if not state.input_buf or not vim.api.nvim_buf_is_valid(state.input_buf) then
+    return '<End>'
+  end
+
+  local line = vim.api.nvim_buf_get_lines(state.input_buf, 0, 1, false)[1] or ''
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  if cursor[2] < #line then
+    return '<End>'
+  end
+
+  local item = state.filtered_items and state.filtered_items[state.cursor] or nil
+  local query = selected_item_query(state, item)
+  if not query then
+    return '<End>'
+  end
+
+  local prompt = state.config and state.config.prompt or ''
+  vim.schedule(function()
+    if
+      state.active
+      and state.input_buf
+      and vim.api.nvim_buf_is_valid(state.input_buf)
+      and state.input_win
+      and vim.api.nvim_win_is_valid(state.input_win)
+    then
+      vim.api.nvim_buf_set_lines(state.input_buf, 0, -1, false, { prompt .. query })
+      state.query = query
+      sync_picker_history()
+      vim.api.nvim_win_set_cursor(state.input_win, { 1, #prompt + #query })
+      if vim.api.nvim_get_current_win() == state.input_win then
+        vim.cmd.startinsert()
+      end
+    end
+  end)
+
+  return ''
+end
+
 define_user_commands = function()
   pcall(vim.api.nvim_del_user_command, 'FFFFind')
   pcall(vim.api.nvim_del_user_command, 'FFFGrep')
@@ -523,6 +599,15 @@ function M.setup()
           desc = desc,
         })
       end
+
+      vim.keymap.set('i', '<c-e>', complete_prompt_with_selected_item, {
+        buffer = args.buf,
+        expr = true,
+        noremap = true,
+        silent = true,
+        nowait = true,
+        desc = 'Complete FFF prompt with selected item',
+      })
 
       buffer_map('<m-u>', function()
         local picker_ui = require('fff.picker_ui')
