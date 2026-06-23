@@ -373,7 +373,7 @@ function M.setup()
   set_highlights()
 
   vim.o.statusline = "%!v:lua.nvimconf_statusline_active()"
-  vim.o.laststatus = 2
+  vim.o.laststatus = 3
 
   local group = vim.api.nvim_create_augroup("nvimconf-minimal.statusline", { clear = true })
 
