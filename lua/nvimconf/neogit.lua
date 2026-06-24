@@ -18,6 +18,7 @@ local function ensure_diffview()
 end
 
 local function ensure_theme()
+  bootstrap.load_plugin("nvim-web-devicons")
   require('nvimconf.theme').ensure()
 end
 
