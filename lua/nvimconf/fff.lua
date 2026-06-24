@@ -68,7 +68,23 @@ local function reset_modules()
   package.loaded['fff.fuzzy'] = nil
   package.loaded['fff.main'] = nil
   package.loaded['fff.picker_ui'] = nil
+  package.loaded['fff.picker_ui.picker_ui'] = nil
+  package.loaded['fff.picker_ui.picker_ui_state'] = nil
   package.loaded['fff.rust'] = nil
+end
+
+local function get_picker_ui()
+  local ok, picker_ui = pcall(require, 'fff.picker_ui.picker_ui')
+  if ok then
+    return picker_ui
+  end
+
+  ok, picker_ui = pcall(require, 'fff.picker_ui')
+  if ok then
+    return picker_ui
+  end
+
+  return nil
 end
 
 -- Wait for fff's callback-style async install/build helpers and return their result.
@@ -197,8 +213,8 @@ local function reopen(fn)
     return
   end
 
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if ok and picker_ui.state and picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if picker_ui and picker_ui.state and picker_ui.state.active then
     picker_ui.close()
   end
 
@@ -345,8 +361,8 @@ local function find_files_in_dir(path)
 end
 
 local function sync_picker_history()
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if not ok or not picker_ui.state or not picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if not picker_ui or not picker_ui.state or not picker_ui.state.active then
     return
   end
 
@@ -367,8 +383,8 @@ local function sync_picker_history()
 end
 
 local function close_picker()
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if ok and picker_ui.state and picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if picker_ui and picker_ui.state and picker_ui.state.active then
     picker_ui.close()
   end
 end
@@ -388,8 +404,8 @@ local function is_absolute_path(path)
 end
 
 local function create_file_from_picker_query()
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if not ok or not picker_ui.state or not picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if not picker_ui or not picker_ui.state or not picker_ui.state.active then
     return
   end
 
@@ -398,7 +414,8 @@ local function create_file_from_picker_query()
     return
   end
 
-  local query = vim.trim(picker_ui.state.query or '')
+  local query = picker_input_query(picker_ui.state) or normalize_query(picker_ui.state.query)
+  query = vim.trim(query or '')
   if query == '' then
     return
   end
@@ -433,8 +450,8 @@ local function create_file_from_picker_query()
 end
 
 local function open_oil_from_picker()
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if not ok or not picker_ui.state or not picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if not picker_ui or not picker_ui.state or not picker_ui.state.active then
     return
   end
 
@@ -481,8 +498,8 @@ local function selected_item_query(state, item)
 end
 
 local function complete_prompt_with_selected_item()
-  local ok, picker_ui = pcall(require, 'fff.picker_ui')
-  if not ok or not picker_ui.state or not picker_ui.state.active then
+  local picker_ui = get_picker_ui()
+  if not picker_ui or not picker_ui.state or not picker_ui.state.active then
     return '<End>'
   end
 
@@ -610,7 +627,10 @@ function M.setup()
       })
 
       buffer_map('<m-u>', function()
-        local picker_ui = require('fff.picker_ui')
+        local picker_ui = get_picker_ui()
+        if not picker_ui or not picker_ui.state then
+          return
+        end
         local query = picker_input_query(picker_ui.state)
         local cwd = picker_ui.state.config and picker_ui.state.config.base_path or vim.uv.cwd()
 
