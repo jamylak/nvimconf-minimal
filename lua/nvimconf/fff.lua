@@ -455,12 +455,21 @@ local function open_oil_from_picker()
     return
   end
 
-  local item = picker_ui.state.filtered_items[picker_ui.state.cursor]
-  if not item or not item.path then
+  local state = picker_ui.state
+  local item = state.filtered_items and state.filtered_items[state.cursor] or nil
+  if not item then
     return
   end
 
   local path = item.path
+  if (not path or path == '') and item.relative_path and state.config and state.config.base_path then
+    path = vim.fs.joinpath(state.config.base_path, item.relative_path)
+  end
+  if type(path) ~= 'string' or path == '' then
+    return
+  end
+
+  path = vim.fs.normalize(path)
   switch_from_picker(function()
     require('nvimconf.oil').open_at_file(path)
   end)
@@ -668,7 +677,19 @@ function M.setup()
       buffer_map('<c-g>', function()
         feed_key_from_picker('<c-g>')
       end, 'Close FFF and open lazygit')
-      buffer_map('<c-o>', open_oil_from_picker, 'Open Oil at selected file')
+      local oil_map_opts = {
+        buffer = args.buf,
+        noremap = true,
+        silent = true,
+        nowait = true,
+        desc = 'Open Oil at selected file',
+      }
+      vim.keymap.set('i', '<c-o>', open_oil_from_picker, oil_map_opts)
+      vim.schedule(function()
+        if vim.api.nvim_buf_is_valid(args.buf) then
+          vim.keymap.set('n', '<c-o>', open_oil_from_picker, oil_map_opts)
+        end
+      end)
       buffer_map('<S-CR>', create_file_from_picker_query, 'FFF create file from query')
 
       local group = vim.api.nvim_create_augroup('nvimconf-minimal.fff_history.' .. args.buf, { clear = true })
