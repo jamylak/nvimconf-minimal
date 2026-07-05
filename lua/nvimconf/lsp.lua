@@ -122,6 +122,12 @@ local servers = {
     root_markers = { 'go.work', 'go.mod', '.git' },
   },
   {
+    name = 'rust_analyzer',
+    cmd = { 'rust-analyzer' },
+    filetypes = { 'rust' },
+    root_markers = { 'Cargo.toml', 'rust-project.json', '.git' },
+  },
+  {
     name = 'lua_ls',
     cmd = { 'lua-language-server' },
     filetypes = { 'lua' },
