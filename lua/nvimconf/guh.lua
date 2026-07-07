@@ -11,6 +11,7 @@ end
 
 local function ensure_loaded()
   if package.loaded["guh.pr"] then
+    require("nvimconf.theme").ensure()
     return true
   end
 
@@ -29,6 +30,7 @@ local function ensure_loaded()
     return false
   end
 
+  require("nvimconf.theme").ensure()
   return true
 end
 
