@@ -258,6 +258,17 @@ local function open_file(command)
 	vim.cmd(command .. " " .. vim.fn.fnameescape(entry.path))
 end
 
+local function open_oil_from_picker()
+	local entry = state.filtered[state.selected]
+	if not entry then
+		return
+	end
+
+	switch_from_picker(function()
+		require("nvimconf.oil").open_at_file(entry.path)
+	end)
+end
+
 local function update_query()
 	state.query = read_query()
 	remember_open(state.query)
@@ -401,6 +412,7 @@ function M.open(initial_query)
 	map({ "i", "n" }, "<C-t>", function()
 		open_file("tabedit")
 	end, "Open oldfile in tab")
+	map({ "i", "n" }, "<C-o>", open_oil_from_picker, "Open Oil at selected file")
 	map({ "i", "n" }, "<m-n>", function()
 		switch_from_picker(function()
 			require("nvimconf.project_picker").open()
