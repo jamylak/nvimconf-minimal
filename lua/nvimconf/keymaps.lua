@@ -277,6 +277,15 @@ map("n", ">T", ":tabmove $<CR>", { silent = true, desc = "Move tab far right" })
 -- Text objects
 map({ "o", "x" }, "iq", 'i"', { silent = true, desc = "Inner double quotes" })
 map({ "o", "x" }, "aq", 'a"', { silent = true, desc = "Around double quotes" })
+-- The implementation is local and is only required when one of these is used.
+map({ "o", "x" }, "iS", '<cmd>lua require("nvimconf.subword_textobj").select(false)<CR>', {
+	silent = true,
+	desc = "Inner subword",
+})
+map({ "o", "x" }, "aS", '<cmd>lua require("nvimconf.subword_textobj").select(true)<CR>', {
+	silent = true,
+	desc = "Around subword",
+})
 
 -- Motions and edits
 map_each("n", { "qk", "<C-e>" }, "$", { silent = true, desc = "End of line" })
